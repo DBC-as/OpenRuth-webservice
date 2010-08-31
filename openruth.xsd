@@ -97,11 +97,7 @@
 		<xs:complexType>
 			<xs:sequence>
 				<xs:element ref="or:agencyId"/>
-				<xs:element ref="or:orderId">
-					<xs:annotation>
-						<xs:documentation>dateTime stamp serving as an unique local identifier of an order</xs:documentation>
-					</xs:annotation>
-				</xs:element>
+				<xs:element ref="or:orderId"/>
 				<xs:element ref="or:callback" minOccurs="0"/>
 				<xs:element ref="or:outputType" minOccurs="0"/>
 			</xs:sequence>
@@ -110,11 +106,7 @@
 	<xs:element name="cancelOrderResponse">
 		<xs:complexType>
 			<xs:choice>
-				<xs:element ref="or:cancelOrderOk">
-					<xs:annotation>
-						<xs:documentation>Indicator that cancelOrderRequest has been accepted</xs:documentation>
-					</xs:annotation>
-				</xs:element>
+				<xs:element ref="or:cancelOrderOk"/>
 				<xs:element ref="or:cancelOrderError"/>
 			</xs:choice>
 		</xs:complexType>
@@ -126,8 +118,8 @@
 		<xs:complexType>
 			<xs:sequence>
 				<xs:element ref="or:agencyId"/>
-				<xs:element ref="or:itemId" maxOccurs="unbounded"/>
 				<xs:element ref="or:showCompingCopies" minOccurs="0"/>
+				<xs:element ref="or:itemId" maxOccurs="unbounded"/>
 				<xs:element ref="or:callback" minOccurs="0"/>
 				<xs:element ref="or:outputType" minOccurs="0"/>
 			</xs:sequence>
@@ -619,7 +611,7 @@
 	</xs:element>
 	<xs:element name="cancelOrderOk">
 		<xs:annotation>
-			<xs:documentation xml:lang="en">Message that cancelOrderRequest has been accepted</xs:documentation>
+			<xs:documentation>Indicator that cancelOrderRequest has been accepted</xs:documentation>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="copiesAvailableCount" type="xs:integer">
@@ -800,7 +792,7 @@
 				<xs:element ref="or:serialPartIssue" minOccurs="0"/>
 				<xs:element ref="or:ordersCount"/>
 				<xs:element ref="or:bookingsCount"/>
-				<xs:element ref="or:orderExpectedAvailabilityDate"/>
+				<xs:element ref="or:itemExpectedDelivery"/>
 				<xs:element ref="or:itemLocation" maxOccurs="unbounded"/>
 				<xs:element ref="or:itemComingLocation" maxOccurs="unbounded"/>
 			</xs:sequence>
@@ -976,7 +968,7 @@
 	</xs:element>
 	<xs:element name="orderId" type="xs:dateTime">
 		<xs:annotation>
-			<xs:documentation xml:lang="en">dateTime stamp serving as an unique identifier of an order</xs:documentation>
+			<xs:documentation>dateTime stamp serving as an unique local identifier of an order</xs:documentation>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="orderItem">
@@ -1533,12 +1525,12 @@
 	</xs:simpleType>
 	<xs:simpleType name="orderItemErrorType">
 		<xs:restriction base="xs:string">
-			<xs:enumeration value="on loan by user"/>
-			<xs:enumeration value="reserved by user"/>
+			<xs:enumeration value="ordering not allowed for this user"/>
+			<xs:enumeration value="already on loan by user"/>
+			<xs:enumeration value="already reserved by user"/>
 			<xs:enumeration value="no copies available for reservation"/>
 			<xs:enumeration value="loan not allowed for this user category"/>
 			<xs:enumeration value="loan not allowed, user too young"/>
-			<xs:enumeration value="item not borrowed by user"/>
 			<xs:enumeration value="unspecified error, order not possible"/>
 			<xs:enumeration value="system error"/>
 		</xs:restriction>
