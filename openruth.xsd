@@ -29,7 +29,7 @@
 			<xs:sequence>
 				<xs:element ref="or:agencyId"/>
 				<xs:element ref="or:itemId"/>
-				<xs:element ref="or:serialPartId" minOccurs="0"/>
+				<xs:element ref="or:itemSerialPartId" minOccurs="0"/>
 				<xs:element ref="or:bookingId"/>
 			</xs:sequence>
 		</xs:complexType>
@@ -56,7 +56,7 @@
 				<xs:element ref="or:bookingEndDate"/>
 				<xs:element ref="or:bookingTotalCount"/>
 				<xs:element ref="or:itemId"/>
-				<xs:element ref="or:serialPartId" minOccurs="0"/>
+				<xs:element ref="or:itemSerialPartId" minOccurs="0"/>
 				<xs:element ref="or:callback" minOccurs="0"/>
 				<xs:element ref="or:outputType" minOccurs="0"/>
 			</xs:sequence>
@@ -713,7 +713,7 @@
 				<xs:element ref="or:itemAuthor" minOccurs="0"/>
 				<xs:element ref="or:itemTitle" minOccurs="0"/>
 				<xs:element ref="or:itemPublicationYear" minOccurs="0"/>
-				<xs:element ref="or:serialPartId" minOccurs="0"/>
+				<xs:element ref="or:itemSerialPartTitle" minOccurs="0"/>
 				<xs:element ref="or:illProviderAgencyId"/>
 				<xs:element ref="or:illStatus"/>
 				<xs:element ref="or:illOrderDate"/>
@@ -792,9 +792,9 @@
 		</xs:annotation>
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element ref="or:serialPartId" minOccurs="0"/>
-				<xs:element ref="or:serialPartVolume" minOccurs="0"/>
-				<xs:element ref="or:serialPartIssue" minOccurs="0"/>
+				<xs:element ref="or:itemSerialPartId" minOccurs="0"/>
+				<xs:element ref="or:itemSerialPartVolume" minOccurs="0"/>
+				<xs:element ref="or:itemSerialPartIssue" minOccurs="0"/>
 				<xs:element ref="or:ordersCount"/>
 				<xs:element ref="or:bookingsCount"/>
 				<xs:element ref="or:itemExpectedAvailabilityDate"/>
@@ -828,6 +828,26 @@
 	<xs:element name="itemPublicationYear" type="xs:string">
 		<xs:annotation>
 			<xs:documentation xml:lang="en">Publication year of an item (bibliographic info)</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="itemSerialPartTitle">
+		<xs:annotation>
+			<xs:documentation>Partitle of a serial publication</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="itemSerialPartId" type="xs:integer">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">Identifier of a part of periodcal or other serial publication. Used in relation with itemId. If 0, empty or not present, item is not part of a serial</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="itemSerialPartIssue" type="xs:string">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">Issue number of a periodical or other serial publication</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="itemSerialPartVolume" type="xs:string">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">Volume of a periodical or other serial publication</xs:documentation>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="itemTitle" type="xs:string">
@@ -1002,7 +1022,7 @@
 		<xs:complexType>
 			<xs:sequence>
 				<xs:element ref="or:itemId"/>
-				<xs:element ref="or:serialPartId" minOccurs="0"/>
+				<xs:element ref="or:itemSerialPartId" minOccurs="0"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
@@ -1077,7 +1097,7 @@
 				<xs:element ref="or:itemAuthor" minOccurs="0"/>
 				<xs:element ref="or:itemTitle" minOccurs="0"/>
 				<xs:element ref="or:itemPublicationYear" minOccurs="0"/>
-				<xs:element ref="or:serialPartId" minOccurs="0"/>
+				<xs:element ref="or:itemSerialPartTitle" minOccurs="0"/>
 				<xs:element ref="or:orderId"/>
 				<xs:element ref="or:orderDate"/>
 				<xs:element ref="or:orderLastInterestDate"/>
@@ -1100,7 +1120,7 @@
 				<xs:element ref="or:itemAuthor" minOccurs="0"/>
 				<xs:element ref="or:itemTitle" minOccurs="0"/>
 				<xs:element ref="or:itemPublicationYear" minOccurs="0"/>
-				<xs:element ref="or:serialPartId" minOccurs="0"/>
+				<xs:element ref="or:itemSerialPartTitle" minOccurs="0"/>
 				<xs:element ref="or:agencyCounter"/>
 				<xs:element ref="or:orderPickUpDate"/>
 				<xs:element ref="or:orderFetchedDate"/>
@@ -1143,21 +1163,6 @@
 	<xs:element name="renewLoanOk" type="xs:string">
 		<xs:annotation>
 			<xs:documentation xml:lang="en">Indicator that renewLoanRequest is accepted</xs:documentation>
-		</xs:annotation>
-	</xs:element>
-	<xs:element name="serialPartId" type="xs:integer">
-		<xs:annotation>
-			<xs:documentation xml:lang="en">Identifier of a part of periodcal or other serial publication. Used in relation with itemId. If 0, empty or not present, item is not part of a serial</xs:documentation>
-		</xs:annotation>
-	</xs:element>
-	<xs:element name="serialPartIssue" type="xs:string">
-		<xs:annotation>
-			<xs:documentation xml:lang="en">Issue number of a periodical or other serial publication</xs:documentation>
-		</xs:annotation>
-	</xs:element>
-	<xs:element name="serialPartVolume" type="xs:string">
-		<xs:annotation>
-			<xs:documentation xml:lang="en">Volume of a periodical or other serial publication</xs:documentation>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="showCompingCopies" type="or:showComingCopiesType">
@@ -1215,14 +1220,14 @@
 			<xs:documentation xml:lang="en">Boolean indicating whether user has lost user card</xs:documentation>
 		</xs:annotation>
 	</xs:element>
-	<xs:element name="userCategory" type="xs:string">
-		<xs:annotation>
-			<xs:documentation xml:lang="en">User category</xs:documentation>
-		</xs:annotation>
-	</xs:element>
-	<xs:element name="userCategoryId" type="xs:string">
+	<xs:element name="userCategoryCode" type="xs:string">
 		<xs:annotation>
 			<xs:documentation xml:lang="en">Identifier of a user category</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="userCategoryName" type="xs:string">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">User category</xs:documentation>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="userCheck">
@@ -1241,8 +1246,8 @@
 				<xs:element ref="or:userOrderAllowed" minOccurs="0"/>
 				<xs:element ref="or:userBookingAllowed" minOccurs="0"/>
 				<xs:element ref="or:userEmail" minOccurs="0"/>
-				<xs:element ref="or:userCategoryId" minOccurs="0"/>
-				<xs:element ref="or:userCategory" minOccurs="0"/>
+				<xs:element ref="or:userCategoryCode" minOccurs="0"/>
+				<xs:element ref="or:userCategoryName" minOccurs="0"/>
 				<xs:element ref="or:agencyCounter" minOccurs="0"/>
 				<xs:element ref="or:userBirthYear" minOccurs="0"/>
 				<xs:element ref="or:userSex" minOccurs="0"/>
@@ -1303,7 +1308,7 @@
 			<xs:sequence>
 				<xs:element ref="or:userFirstName"/>
 				<xs:element ref="or:userLastName"/>
-				<xs:element ref="or:userCategory"/>
+				<xs:element ref="or:userCategoryName"/>
 				<xs:element ref="or:userAddress"/>
 				<xs:element ref="or:userPostCode"/>
 				<xs:element ref="or:userCity"/>
@@ -1480,9 +1485,9 @@
 	<xs:simpleType name="fineTypeType">
 		<xs:restriction base="xs:string">
 			<xs:enumeration value="compensation"/>
-			<xs:enumeration value="1. recall"/>
-			<xs:enumeration value="2. recall"/>
-			<xs:enumeration value="3. recall"/>
+			<xs:enumeration value="first recall"/>
+			<xs:enumeration value="second recall"/>
+			<xs:enumeration value="third recall"/>
 		</xs:restriction>
 	</xs:simpleType>
 	<xs:simpleType name="illStatusType">
@@ -1515,9 +1520,9 @@
 		<xs:restriction base="xs:string">
 			<xs:enumeration value="late"/>
 			<xs:enumeration value="compensation"/>
-			<xs:enumeration value="1. recall"/>
-			<xs:enumeration value="2. recall"/>
-			<xs:enumeration value="3. recall"/>
+			<xs:enumeration value="first recall"/>
+			<xs:enumeration value="second recall"/>
+			<xs:enumeration value="third recall"/>
 		</xs:restriction>
 	</xs:simpleType>
 	<xs:simpleType name="loanRenewableType">
@@ -1592,13 +1597,13 @@
 	</xs:simpleType>
 	<xs:simpleType name="userErrorType">
 		<xs:restriction base="xs:string">
-			<xs:enumeration value="unknown user"/>
+			<xs:enumeration value="unknown userId"/>
 			<xs:enumeration value="wrong pin code"/>
 		</xs:restriction>
 	</xs:simpleType>
 	<xs:simpleType name="userPaymentErrorType">
 		<xs:restriction base="xs:string">
-			<xs:enumeration value="unknown user"/>
+			<xs:enumeration value="unknown userId"/>
 			<xs:enumeration value="amount is not the full amount"/>
 		</xs:restriction>
 	</xs:simpleType>
