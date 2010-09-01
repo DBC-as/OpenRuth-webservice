@@ -546,7 +546,7 @@
 	</xs:element>
 	<xs:element name="bookingId" type="xs:dateTime">
 		<xs:annotation>
-			<xs:documentation xml:lang="en">Unique local identifier of a booking</xs:documentation>
+			<xs:documentation xml:lang="en">dateTime stamp serving as a unique local identifier of a booking</xs:documentation>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="bookingLoanedCount" type="xs:integer">
@@ -1453,7 +1453,7 @@
 			<xs:enumeration value="deficit"/>
 			<xs:enumeration value="closed"/>
 			<xs:enumeration value="retained"/>
-			<xs:enumeration value="restordre"/>
+			<xs:enumeration value="back order"/>
 			<xs:enumeration value="on loan"/>
 			<xs:enumeration value="partly returned"/>
 			<xs:enumeration value="partly on loan"/>
@@ -1493,8 +1493,8 @@
 	<xs:simpleType name="illStatusType">
 		<xs:restriction base="xs:string">
 			<xs:enumeration value="new"/>
-			<xs:enumeration value="unkown user"/>
-			<xs:enumeration value="unkown agency"/>
+			<xs:enumeration value="unknown user"/>
+			<xs:enumeration value="unknown provider agency"/>
 			<xs:enumeration value="created"/>
 			<xs:enumeration value="ordered"/>
 			<xs:enumeration value="can not be delivered"/>
