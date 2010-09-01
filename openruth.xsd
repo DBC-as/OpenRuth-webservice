@@ -767,7 +767,7 @@
 				<xs:element ref="or:agencyDepartmentId" minOccurs="0"/>
 				<xs:element ref="or:agencyPlacementId" minOccurs="0"/>
 				<xs:element ref="or:copiesCount"/>
-				<xs:element ref="or:itemExpectedDelivery"/>
+				<xs:element ref="or:itemExpectedDeliveryDate"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
@@ -776,9 +776,14 @@
 			<xs:documentation xml:lang="en">Title information (typically a one liner with author, title, publication year) on an item for display purposes</xs:documentation>
 		</xs:annotation>
 	</xs:element>
-	<xs:element name="itemExpectedDelivery" type="xs:date">
+	<xs:element name="itemExpectedDeliveryDate" type="xs:date">
 		<xs:annotation>
 			<xs:documentation xml:lang="en">Expected date when a not yet available item is ready at a given location</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="itemExpectedAvailabilityDate">
+		<xs:annotation>
+			<xs:documentation>Expected date when an item can be available for a user who has not already ordered the material</xs:documentation>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="itemHoldings">
@@ -792,7 +797,7 @@
 				<xs:element ref="or:serialPartIssue" minOccurs="0"/>
 				<xs:element ref="or:ordersCount"/>
 				<xs:element ref="or:bookingsCount"/>
-				<xs:element ref="or:itemExpectedDelivery"/>
+				<xs:element ref="or:itemExpectedAvailabilityDate"/>
 				<xs:element ref="or:itemLocation" maxOccurs="unbounded"/>
 				<xs:element ref="or:itemComingLocation" maxOccurs="unbounded"/>
 			</xs:sequence>
