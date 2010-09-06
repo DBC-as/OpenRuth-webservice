@@ -1603,6 +1603,7 @@
 	<xs:simpleType name="userErrorType">
 		<xs:restriction base="xs:string">
 			<xs:enumeration value="authentication_error"/>
+			<xs:enumeration value="cannot reach local system"/>
 			<xs:enumeration value="unknown agencyId"/>
 			<xs:enumeration value="unknown userId"/>
 			<xs:enumeration value="wrong pin code"/>
