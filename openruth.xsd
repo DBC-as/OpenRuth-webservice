@@ -23,14 +23,14 @@
 	</xs:element>
 	<xs:element name="bookingInfoRequest">
 		<xs:annotation>
-			<xs:documentation xml:lang="en">The service request for information about number of copies in a booking available at various times</xs:documentation>
+			<xs:documentation xml:lang="en">The service request for information about number of copies of an item available at various times. If an active bookingId is included the number of copies included in that booking will be taken into count.</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:sequence>
 				<xs:element ref="or:agencyId"/>
 				<xs:element ref="or:itemId"/>
 				<xs:element ref="or:itemSerialPartId" minOccurs="0"/>
-				<xs:element ref="or:bookingId"/>
+				<xs:element ref="or:bookingId" minOccurs="0"/>
 				<xs:element ref="or:callback" minOccurs="0"/>
 				<xs:element ref="or:outputType" minOccurs="0"/>
 			</xs:sequence>
@@ -39,9 +39,8 @@
 	<xs:element name="bookingInfoResponse">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element ref="or:bookingTotalCount"/>
+				<xs:element ref="or:bookingInfoTotalCount"/>
 				<xs:element ref="or:bookingChange" maxOccurs="unbounded"/>
-				<xs:element ref="or:bookingNote" minOccurs="0"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
@@ -515,7 +514,7 @@
 	</xs:element>
 	<xs:element name="bookingChange">
 		<xs:annotation>
-			<xs:documentation xml:lang="en">Changes in a booking, used bookingInfoResponse</xs:documentation>
+			<xs:documentation xml:lang="en">Changes in a potential booking, used in bookingInfoResponse</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:sequence>
@@ -526,12 +525,12 @@
 	</xs:element>
 	<xs:element name="bookingChangeCount" type="xs:integer">
 		<xs:annotation>
-			<xs:documentation xml:lang="en">Change in number of available copies of booked item (related to bookingChangeDate)</xs:documentation>
+			<xs:documentation xml:lang="en">Change in number of copies available for booking (related to bookingChangeDate)</xs:documentation>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="bookingChangeDate" type="xs:date">
 		<xs:annotation>
-			<xs:documentation xml:lang="en">Date when number of available copies of a booked item changes (related to bookingChangeCount)</xs:documentation>
+			<xs:documentation xml:lang="en">Date when number of available copies available for booking changes (related to bookingChangeCount)</xs:documentation>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="bookingEndDate" type="xs:date">
@@ -552,6 +551,11 @@
 	<xs:element name="bookingId" type="xs:dateTime">
 		<xs:annotation>
 			<xs:documentation xml:lang="en">dateTime stamp serving as a unique local identifier of a booking</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="bookingInfoTotalCount" type="xs:integer">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">Total number of copies available for booking</xs:documentation>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="bookingLoanedCount" type="xs:integer">
