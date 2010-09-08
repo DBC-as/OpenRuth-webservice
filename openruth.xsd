@@ -150,7 +150,7 @@
 				<xs:element ref="or:agencyCounter"/>
 				<xs:element ref="or:orderOverRule"/>
 				<xs:element ref="or:orderPriority"/>
-				<xs:element ref="or:orderType"/>
+				<xs:element ref="or:orderEachItem" minOccurs="0"/>
 				<xs:element ref="or:orderItemId" maxOccurs="unbounded"/>
 				<xs:element ref="or:callback" minOccurs="0"/>
 				<xs:element ref="or:outputType" minOccurs="0"/>
@@ -616,7 +616,7 @@
 	</xs:element>
 	<xs:element name="cancelOrderOk">
 		<xs:annotation>
-			<xs:documentation>Indicator that cancelOrderRequest has been accepted</xs:documentation>
+			<xs:documentation xml:lang="en">Indicator that cancelOrderRequest has been accepted</xs:documentation>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="copiesAvailableCount" type="xs:integer">
@@ -788,7 +788,7 @@
 	</xs:element>
 	<xs:element name="itemExpectedAvailabilityDate">
 		<xs:annotation>
-			<xs:documentation>Expected date when an item can be available for a user who has not already ordered the material</xs:documentation>
+			<xs:documentation xml:lang="en">Expected date when an item can be available for a user who has not already ordered the material</xs:documentation>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="itemHoldings">
@@ -837,7 +837,7 @@
 	</xs:element>
 	<xs:element name="itemSerialPartTitle">
 		<xs:annotation>
-			<xs:documentation>Partitle of a serial publication</xs:documentation>
+			<xs:documentation xml:lang="en">Partitle of a serial publication</xs:documentation>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="itemSerialPartId" type="xs:integer">
@@ -986,6 +986,11 @@
 			<xs:documentation xml:lang="en">Date when an order has been created in local system</xs:documentation>
 		</xs:annotation>
 	</xs:element>
+	<xs:element name="orderEachItem" type="xs:boolean">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">Boolean. If true a reservation shall be made for each item in request, if false (or not present) order is ready when first available item is fetched</xs:documentation>
+		</xs:annotation>
+	</xs:element>
 	<xs:element name="orderExpectedAvailabilityDate" type="xs:date">
 		<xs:annotation>
 			<xs:documentation xml:lang="en">Date when an order is expected to be ready for an user</xs:documentation>
@@ -998,7 +1003,7 @@
 	</xs:element>
 	<xs:element name="orderId" type="xs:dateTime">
 		<xs:annotation>
-			<xs:documentation>dateTime stamp serving as an unique local identifier of an order</xs:documentation>
+			<xs:documentation xml:lang="en">dateTime stamp serving as an unique local identifier of an order</xs:documentation>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="orderItem">
@@ -1022,7 +1027,7 @@
 	</xs:element>
 	<xs:element name="orderItemId">
 		<xs:annotation>
-			<xs:documentation>Combination of itemId and optional serialPartId used when ordering items or serialParts</xs:documentation>
+			<xs:documentation xml:lang="en">Combination of itemId and optional serialPartId used when ordering items or serialParts</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:sequence>
@@ -1559,7 +1564,11 @@
 			<xs:enumeration value="normal"/>
 			<xs:enumeration value="high"/>
 			<xs:enumeration value="express"/>
-			<xs:enumeration value="booking"/>
+			<xs:enumeration value="booking">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">Can not be used with orderItemRequest</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
 		</xs:restriction>
 	</xs:simpleType>
 	<xs:simpleType name="orderTypeType">
