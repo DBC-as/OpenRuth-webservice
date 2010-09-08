@@ -1568,11 +1568,6 @@
 			<xs:enumeration value="normal"/>
 			<xs:enumeration value="high"/>
 			<xs:enumeration value="express"/>
-			<xs:enumeration value="booking">
-				<xs:annotation>
-					<xs:documentation xml:lang="en">Can not be used with orderItemRequest</xs:documentation>
-				</xs:annotation>
-			</xs:enumeration>
 		</xs:restriction>
 	</xs:simpleType>
 	<xs:simpleType name="orderTypeType">
