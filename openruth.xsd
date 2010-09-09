@@ -38,10 +38,10 @@
 	</xs:element>
 	<xs:element name="bookingInfoResponse">
 		<xs:complexType>
-			<xs:sequence>
-				<xs:element ref="or:bookingInfoTotalCount"/>
-				<xs:element ref="or:bookingChange" maxOccurs="unbounded"/>
-			</xs:sequence>
+			<xs:choice>
+				<xs:element ref="or:bookingInfo"/>
+				<xs:element ref="or:bookingError"/>
+			</xs:choice>
 		</xs:complexType>
 	</xs:element>
 	<xs:element name="bookItemRequest">
@@ -552,6 +552,14 @@
 		<xs:annotation>
 			<xs:documentation xml:lang="en">dateTime stamp serving as a unique local identifier of a booking</xs:documentation>
 		</xs:annotation>
+	</xs:element>
+	<xs:element name="bookingInfo">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="or:bookingInfoTotalCount"/>
+				<xs:element ref="or:bookingChange" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
 	</xs:element>
 	<xs:element name="bookingInfoTotalCount" type="xs:integer">
 		<xs:annotation>
