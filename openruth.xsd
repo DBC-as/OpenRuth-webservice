@@ -281,10 +281,10 @@
 	</xs:element>
 	<xs:element name="userCheckResponse">
 		<xs:complexType>
-			<xs:sequence>
+			<xs:choice>
 				<xs:element ref="or:userCheck"/>
 				<xs:element ref="or:userError"/>
-			</xs:sequence>
+			</xs:choice>
 		</xs:complexType>
 	</xs:element>
 	<xs:element name="userPaymentRequest">
