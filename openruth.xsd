@@ -1471,6 +1471,7 @@
 			<xs:enumeration value="unknown agencyId"/>
 			<xs:enumeration value="cannot reach local system"/>
 			<xs:enumeration value="No counters found"/>
+			<xs:enumeration value="No holdings found"/>
 			<xs:enumeration value="cannot decode answer"/>
 		</xs:restriction>
 	</xs:simpleType>
