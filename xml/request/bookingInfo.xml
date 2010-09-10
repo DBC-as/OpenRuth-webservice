@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:open="http://oss.dbc.dk/ns/openruth">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <open:bookingInfoRequest>
+         <open:agencyId>?</open:agencyId>
+         <open:itemId>?</open:itemId>
+         <!--Optional:-->
+         <open:serialPartId>?</open:serialPartId>
+         <open:bookingId>?</open:bookingId>
+      </open:bookingInfoRequest>
+   </soapenv:Body>
+</soapenv:Envelope>

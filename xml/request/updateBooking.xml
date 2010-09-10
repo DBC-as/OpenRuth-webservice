@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:open="http://oss.dbc.dk/ns/openruth">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <open:updateBookingRequest>
+         <open:bookingId>?</open:bookingId>
+         <!--Optional:-->
+         <open:agencyCounter>?</open:agencyCounter>
+         <!--Optional:-->
+         <open:bookingNote>?</open:bookingNote>
+         <!--Optional:-->
+         <open:bookingStartDate>?</open:bookingStartDate>
+         <!--Optional:-->
+         <open:bookingEndDate>?</open:bookingEndDate>
+         <!--Optional:-->
+         <open:bookingsCount>?</open:bookingsCount>
+         <!--Optional:-->
+         <open:callback>?</open:callback>
+         <!--Optional:-->
+         <open:outputType>?</open:outputType>
+      </open:updateBookingRequest>
+   </soapenv:Body>
+</soapenv:Envelope>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="http://oss.dbc.dk/ns/openruth"><SOAP-ENV:Body>
+<ns1:cancelOrderRequest>
+  <ns1:agencyId>010100</ns1:agencyId>
+  <ns1:orderId>??</ns1:orderId>
+</ns1:cancelOrderRequest>
+</SOAP-ENV:Body></SOAP-ENV:Envelope>
+

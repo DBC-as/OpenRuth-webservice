@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:open="http://oss.dbc.dk/ns/openruth">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <open:userStatusRequest>
+         <open:agencyId>?</open:agencyId>
+         <open:userId>?</open:userId>
+         <open:userPinCode>?</open:userPinCode>
+         <!--Optional:-->
+         <open:callback>?</open:callback>
+         <!--Optional:-->
+         <open:outputType>?</open:outputType>
+      </open:userStatusRequest>
+   </soapenv:Body>
+</soapenv:Envelope>
