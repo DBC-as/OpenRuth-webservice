@@ -1,0 +1,236 @@
+; Inifile for openruth
+
+[setup]
+version = 0.1
+
+; wsdl for service
+wsdl = openruth.wsdl
+
+; in_house_domain may use ?ShowInfo and use create_sample form
+;in_house_domain = .dbc.dk
+
+; set to TRUE to expose the create_sample form
+;show_samples = 1
+
+; validate
+;validate[soap_request] = soap.xsd
+;validate[request] = openruth.xsd
+;validate[response] = openruth.xsd
+
+; soapActions and their corresponding request structure
+; Can be found in the wsdl but is stated here for convenience
+soapAction[agencyCounters] = agencyCountersRequest
+soapAction[holdings] = holdingsRequest
+soapAction[bookingInfo] = bookingInfoRequest
+soapAction[bookItem] = bookItemRequest
+soapAction[updateBooking] = updateBookingRequest
+soapAction[cancelBooking] = cancelBookingRequest
+soapAction[cancelOrder] = cancelOrderRequest
+soapAction[orderItem] = orderItemRequest
+soapAction[updateOrder] = updateOrderRequest
+soapAction[renewLoan] = renewLoanRequest
+soapAction[updateUserInfo] = updateUserInfoRequest
+soapAction[userCheck] = userCheckRequest
+soapAction[userPayment] = usermentPayRequest
+soapAction[userStatus] = userStatusRequest
+
+
+; prefixes and namespaces
+xmlns[] = http://oss.dbc.dk/ns/openruth
+
+; path to xml-examples
+xmldir = ./xml
+
+; memcache
+;cache_host = localhost
+;cache_port = 11211
+;cache_expire = 600
+
+; logfile for verbose output
+logfile = /tmp/openruth.log
+
+; set verboselevel
+;   WARNING - simple warnings
+;   ERROR   - errors in response
+;   FATAL   - major errors
+;   STAT    - Statístical logging
+;   TIMER   - timer logging
+;   TRACE   - program trace
+;   DEBUG   - debugging info
+;   Z3959   - calls to z3950 services
+;   OCI     - oracle
+verbose = WARNING+ERROR+FATAL+STAT+TIMER+TRACE+DEBUG+Z3950+OCI
+
+; format for automatic timer dump %s is the soap-action used
+dump_timer = openruth
+
+[ztargets]
+; Ruth target_info
+ruth[AGENCYID][host] = z3950.DB.integrabib.dk
+ruth[AGENCYID][authentication] = ophelia/DB/PASSWD
+ruth[AGENCYID][timeout] = 30
+ruth[AGENCYID][userStatus][database] = DB-borrowerstatus
+ruth[AGENCYID][userStatus][rpn] = @attrset 1.2.840.10003.3.1000.105.3 @and @attr 1=1 %s @and @attr 1=4 %s @attr 1=5 %s
+ruth[AGENCYID][userCheck][database] = DB-borrowercheck
+ruth[AGENCYID][userCheck][rpn] = @attrset 1.2.840.10003.3.1000.105.3 @and @attr 1=1 %s @and @attr 1=4 %s @attr 1=5 %s
+ruth[AGENCYID][agencyCounters][database] = DB-libraryid
+ruth[AGENCYID][agencyCounters][rpn] = @attrset 1.2.840.10003.3.1000.105.3 @attr 1=1 %s
+ruth[AGENCYID][itemOrder][database] = DB-ophelia
+ruth[AGENCYID][holdings][database] = DB-ophelia
+ruth[AGENCYID][holdings][rpn] = @attr 4=103 @attr BIB1 1=12 %s
+ruth[AGENCYID][holdings][database] = DB-titles
+ruth[AGENCYID][holdings][rpn] = @attrset 1.2.840.10003.3.1000.105.3 @and @attr 1=1 %s @attr 1=2 %s
+
+[aaa]
+; aaa Authentication, Access control and Accounting
+;
+; if aaa_credentials is set, the rights-object is created from
+; aaa_ip_rights below if ip-match otherwise it is set from 
+; the FORS-server if aaa_credentials contains a valid fors-login
+;
+; oci credentials for FORS server
+aaa_credentials = next_vip_kig/next@tora1.dbc.dk
+; memcache server - use localhost in one-webserver environment
+;aaa_cache_address = localhost:11211
+; number of seconds to cache authentication and access rights info
+;aaa_cache_seconds = 3600
+;
+; As an alternative to FORS rights, rights can be set here for selected ip-addresses
+; aaa_ip_rights[group-identifier][ip_list] = list of ip's
+; aaa_ip_rights[group-identifier][ressource][<named ressource>] = right to <named ressource>
+; aaa_ip_rights[group-identifier][ressource][<named ressource 2>] = right to <named ressource 2>
+;
+aaa_ip_rights[dbc][ip_list] = 172.16.0.0-172.31.255.255;193.111.162.0-193.111.162.255
+aaa_ip_rights[dbc][ressource][openruth] = 500
+
+
+[rest]
+; REST parameters for SOAPAction
+;
+; use xml.path.to.par notation to solve name-conflicts
+; action[thisSoapAction][foo][] = some.number
+; action[thisSoapAction][bar][] = another.number
+; to build 
+; <thisSoapAction>
+;   <foo>
+;     <number>nn</number>
+;   </foo>
+;   <bar>
+;     <number>mm</number>
+;   </bar>
+; </thisSoapAction>
+; from url: action=thisSoapAction&some.number=nn&another.number=mm
+;
+; If xml-tags must be in the same order as the xsd in order to validate
+; use the same order below as in the xsd used for validating
+;
+
+action[agencyCounters][] = agencyId
+action[agencyCounters][] = callback
+action[agencyCounters][] = outputType
+
+action[holdings][] = agencyId
+action[holdings][] = showCompingCopies
+action[holdings][] = itemId
+action[holdings][] = callback
+action[holdings][] = outputType
+
+action[bookingInfo][] = agencyId
+action[bookingInfo][] = itemId
+action[bookingInfo][] = serialPartId
+action[bookingInfo][] = bookingId
+action[bookingInfo][] = callback
+action[bookingInfo][] = outputType
+
+action[bookItem][] = userId
+action[bookItem][] = agencyCounter
+action[bookItem][] = bookingNote
+action[bookItem][] = bookingStartDate
+action[bookItem][] = bookingEndDate
+action[bookItem][] = bookingTotalCount
+action[bookItem][] = itemId
+action[bookItem][] = serialPartId
+action[bookItem][] = callback
+action[bookItem][] = outputType
+
+action[updateBooking][] = bookingId
+action[updateBooking][] = agencyCounter
+action[updateBooking][] = bookingNote
+action[updateBooking][] = bookingStartDate
+action[updateBooking][] = bookingEndDate
+action[updateBooking][] = bookingsCount
+action[updateBooking][] = callback
+action[updateBooking][] = outputType
+
+action[cancelBooking][] = bookingId
+action[cancelBooking][] = callback
+action[cancelBooking][] = outputType
+
+action[cancelOrder][] = agencyId
+action[cancelOrder][] = orderId
+action[cancelOrder][] = callback
+action[cancelOrder][] = outputType
+
+action[orderItem][] = agencyId
+action[orderItem][] = orderId
+action[orderItem][] = orderNote
+action[orderItem][] = orderLastInterestDate
+action[orderItem][] = agencyCounter
+action[orderItem][] = orderOverRide
+action[orderItem][] = Priority
+action[orderItem][] = orderType
+action[orderItem][] = orderItem
+action[orderItem][] = callback
+action[orderItem][] = outputType
+
+action[updateOrder][] = agencyId
+action[updateOrder][] = orderId
+action[updateOrder][] = orderNote
+action[updateOrder][] = orderLastInterestDate
+action[updateOrder][] = agencyCounter
+action[updateOrder][] = callback
+action[updateOrder][] = outputType
+
+action[renewLoan][] = agencyId
+action[renewLoan][] = userId
+action[renewLoan][] = sopyId
+action[renewLoan][] = callback
+action[renewLoan][] = outputType
+
+action[updateUserInfo][] = agencyId
+action[updateUserInfo][] = userId
+action[updateUserInfo][] = userPinCodeOld
+action[updateUserInfo][] = userPinCodeNew
+action[updateUserInfo][] = userEmail
+action[updateUserInfo][] = userMobilePhone
+action[updateUserInfo][] = userPreReturnMessage
+action[updateUserInfo][] = userFirstName
+action[updateUserInfo][] = userLastName
+action[updateUserInfo][] = agencyCounter
+action[updateUserInfo][] = callback
+action[updateUserInfo][] = outputType
+
+action[userCheck][] = agencyId
+action[userCheck][] = userId
+action[userCheck][] = userPinCode
+action[userCheck][] = callback
+action[userCheck][] = outputType
+
+action[userPayment][] = agencyId
+action[userPayment][] = userId
+action[userPayment][] = fineAmountPaid
+action[userPayment][] = callback
+action[userPayment][] = outputType
+
+action[userStatus][] = agencyId
+action[userStatus][] = userId
+action[userStatus][] = userPinCode
+action[userStatus][] = callback
+action[userStatus][] = outputType
+
+
+
+[howru]
+;test[] = search&query=danmark&stepValue=1
+;preg_match[] = hitCount
+;error[] = ERROR searching for danmark
