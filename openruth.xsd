@@ -7,7 +7,7 @@
 		</xs:annotation>
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element ref="or:agencyId" maxOccurs="unbounded"/>
+				<xs:element ref="or:agencyId"/>
 				<xs:element ref="or:callback" minOccurs="0"/>
 				<xs:element ref="or:outputType" minOccurs="0"/>
 			</xs:sequence>
@@ -17,7 +17,7 @@
 		<xs:complexType>
 			<xs:choice>
 				<xs:element ref="or:agencyError"/>
-				<xs:element ref="or:agencyCounters" maxOccurs="unbounded"/>
+				<xs:element ref="or:agencyCounters"/>
 			</xs:choice>
 		</xs:complexType>
 	</xs:element>
