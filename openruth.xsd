@@ -1491,6 +1491,9 @@
 	</xs:simpleType>
 	<xs:simpleType name="bookingErrorType">
 		<xs:restriction base="xs:string">
+			<xs:enumeration value="no agencyId supplied"/>
+			<xs:enumeration value="unknown agencyId"/>
+			<xs:enumeration value="no itemId, titlePartNo or bookingId supplied"/>
 			<xs:enumeration value="overbooking"/>
 			<xs:enumeration value="counter does not exist"/>
 			<xs:enumeration value="bookingStartDate must before bookingEndDate"/>
