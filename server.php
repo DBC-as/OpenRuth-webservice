@@ -64,13 +64,17 @@ class openRuth extends webServiceServer {
         $z->set_element("default");
         $rpn = "@attrset 1.2.840.10003.3.1000.105.3 @attr 1=1 %s";
         $z->set_rpn(sprintf($rpn, $agencyId));
+        $this->watch->start("zsearch");
         $hits = $z->z3950_search($tgt["timeout"]);
+        $this->watch->stop("zsearch");
         if ($err = $z->get_errno()) {
           $res->userError->_value = "cannot reach local system - (" . $err . ")";
         } elseif (empty($hits))
           $res->userError->_value = "No counters found";
         else {
+          $this->watch->start("zrecord");
           $rec = $z->z3950_record();
+          $this->watch->stop("zrecord");
           //print_r($rec);
           $dom = new DomDocument();
           $dom->preserveWhiteSpace = false;
@@ -129,7 +133,9 @@ class openRuth extends webServiceServer {
           $pids[] =$param->itemId->_value;
         foreach ($pids as $pid) {
           $z->set_rpn(sprintf($rpn, $pid, $agencyId));
+          $this->watch->start("zsearch");
           $hits = $z->z3950_search($tgt["timeout"]);
+          $this->watch->stop("zsearch");
 //echo "hits: " . $hits . "\n";
           if ($hits > 1)
             verbose::log(ERROR, "holdings(" . __LINE__ . "):: More than one hits searching for id: " . $pid . " and agency: " . $agencyId);
@@ -139,7 +145,9 @@ class openRuth extends webServiceServer {
           } elseif (empty($hits))
             $res->agencyError->_value = "No holdings found";
           else {
+            $this->watch->start("zrecord");
             $rec = $z->z3950_record(1);
+            $this->watch->stop("zrecord");
 //echo "rec: " . $rec . "\n"; die();
             // clip holdings
             if (($p = strpos($rec, '<holdings>')) && ($p_end = strpos($rec, '</holdings>', $p)))
@@ -506,7 +514,9 @@ class openRuth extends webServiceServer {
         $z->set_element("test");
         $rpn = "@attrset 1.2.840.10003.3.1000.105.3 @and @attr 1=1 %s @and @attr 1=4 %s @attr 1=5 %s";
         $z->set_rpn(sprintf($rpn, $agencyId, $param->userId->_value, $param->userPinCode->_value));
+        $this->watch->start("zsearch");
         $hits = $z->z3950_search($tgt["timeout"]);
+        $this->watch->stop("zsearch");
 //var_dump($hits);
 //var_dump($z->get_errno());
         if ($err = $z->get_errno()) {
@@ -514,7 +524,9 @@ class openRuth extends webServiceServer {
         } elseif (empty($hits))
           $res->userError->_value = "unknown userId";
         else {
+          $this->watch->start("zrecord");
           $rec = $z->z3950_record();
+          $this->watch->stop("zrecord");
           //print_r($rec);
           $dom = new DomDocument();
           $dom->preserveWhiteSpace = false;
@@ -581,7 +593,9 @@ class openRuth extends webServiceServer {
         $z->set_element("default");
         $rpn = "@attrset 1.2.840.10003.3.1000.105.3 @and @attr 1=1 %s @and @attr 1=4 %s @attr 1=5 %s";
         $z->set_rpn(sprintf($rpn, $agencyId, $param->userId->_value, $param->userPinCode->_value));
+        $this->watch->start("zsearch");
         $hits = $z->z3950_search($tgt["timeout"]);
+        $this->watch->stop("zsearch");
         if ($err = $z->get_errno()) {
           if ($err == 1103) $res->userError->_value = "unknown userId";
           elseif ($err == 1104) $res->userError->_value = "wrong pin code";
@@ -589,7 +603,9 @@ class openRuth extends webServiceServer {
         } elseif (empty($hits))
           $res->userError->_value = "unknown userId";
         else {
+          $this->watch->start("zrecord");
           $rec = $z->z3950_record();
+          $this->watch->stop("zrecord");
           //print_r($rec); die();
           $dom = new DomDocument();
           $dom->preserveWhiteSpace = false;
