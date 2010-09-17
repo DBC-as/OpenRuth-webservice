@@ -812,11 +812,11 @@
 				<xs:element ref="or:itemSerialPartId" minOccurs="0"/>
 				<xs:element ref="or:itemSerialPartVolume" minOccurs="0"/>
 				<xs:element ref="or:itemSerialPartIssue" minOccurs="0"/>
-				<xs:element ref="or:ordersCount"/>
-				<xs:element ref="or:bookingsCount"/>
-				<xs:element ref="or:itemExpectedAvailabilityDate"/>
-				<xs:element ref="or:itemLocation" maxOccurs="unbounded"/>
-				<xs:element ref="or:itemComingLocation" maxOccurs="unbounded"/>
+				<xs:element ref="or:ordersCount" minOccurs="0"/>
+				<xs:element ref="or:bookingsCount" minOccurs="0"/>
+				<xs:element ref="or:itemExpectedAvailabilityDate" minOccurs="0"/>
+				<xs:element ref="or:itemLocation" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="or:itemComingLocation" minOccurs="0" maxOccurs="unbounded"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
