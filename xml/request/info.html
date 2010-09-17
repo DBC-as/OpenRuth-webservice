@@ -1,0 +1,40 @@
+Actions and Parameters:
+<ul>
+  <li>agencyCounters</li>
+  <ul>
+    <li>agencyId:</li> Id of the agency, like 123456 or DK-123456
+  </ul>
+  <li>holdings</li>
+  <ul>
+    <li>agencyId:</li> Id of the agency, like 123456 or DK-123456
+    <li>itemId:</li> Id of item, repeatable
+  </ul>
+  <li>orderItem</li>
+  <ul>
+    <li>agencyId:</li> Id of the agency, like 123456 or DK-123456
+    <li>userId:</li> Id of the user
+    <li>orderNote:</li> Note for the order
+    <li>orderLastInterestDate:</li> Last interest date like YYYY-MM-DD
+    <li>agencyCounter:</li> Pickup counter
+    <li>orderOverRule:</li> true or false or empty
+    <li>orderPriority:</li> normal, high or express
+    <li>orderEachItem:</li> true or false or empty
+    <li>itemId:</li> Id of item to order, repeatable
+    <li>itemSerialPartId:</li> For serials, Serial Id, otherwise empty, repeatable
+  </ul>
+  <li>userCheck</li>
+  <ul>
+    <li>agencyId:</li> Id of the agency, like 123456 or DK-123456
+    <li>userId:</li> Id of the user
+    <li>userPinCode:</li> Pincode to the user Id
+  </ul>
+  <li>userStatus</li>
+  <ul>
+    <li>agencyId:</li> Id of the agency, like 123456 or DK-123456
+    <li>userId:</li> Id of the user
+    <li>userPinCode:</li> Pincode to the user Id
+  </ul>
+</ul>
+
+<a href="openruth.wsdl">The WSDL is here</a>
+
