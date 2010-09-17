@@ -8,8 +8,11 @@
   <ns1:agencyCounter>??</ns1:agencyCounter>
   <ns1:orderOverRule>??</ns1:orderOverRule>
   <ns1:orderPriority>??</ns1:orderPriority>
-  <ns1:orderType>??</ns1:orderType>
-  <ns1:orderItemId>??</ns1:orderItemId>
+  <ns1:orderEachItem>??</ns1:orderEachItem>
+  <ns1:orderItemId>
+    <ns1:itemId>??</ns1:itemId>
+    <ns1:itemSerialPartId>??</ns1:itemSerialPartId>
+  </ns1:orderItemId>
 </ns1:orderItemRequest>
 </SOAP-ENV:Body></SOAP-ENV:Envelope>
 

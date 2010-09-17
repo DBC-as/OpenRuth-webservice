@@ -163,14 +163,17 @@ action[cancelOrder][] = callback
 action[cancelOrder][] = outputType
 
 action[orderItem][] = agencyId
-action[orderItem][] = orderId
+action[orderItem][] = userId
 action[orderItem][] = orderNote
 action[orderItem][] = orderLastInterestDate
 action[orderItem][] = agencyCounter
-action[orderItem][] = orderOverRide
-action[orderItem][] = Priority
-action[orderItem][] = orderType
-action[orderItem][] = orderItem
+action[orderItem][] = orderOverRule
+action[orderItem][] = orderPriority
+action[orderItem][] = orderEachItem
+action[orderItem][orderItemId][] = itemId
+action[orderItem][orderItemId][] = orderItemId.itemId
+action[orderItem][orderItemId][] = itemSerialPartId
+action[orderItem][orderItemId][] = orderItemId.itemSerialPartId
 action[orderItem][] = callback
 action[orderItem][] = outputType
 
@@ -184,7 +187,7 @@ action[updateOrder][] = outputType
 
 action[renewLoan][] = agencyId
 action[renewLoan][] = userId
-action[renewLoan][] = sopyId
+action[renewLoan][] = copyId
 action[renewLoan][] = callback
 action[renewLoan][] = outputType
 
