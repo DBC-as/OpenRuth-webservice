@@ -117,6 +117,12 @@ class openRuth extends webServiceServer {
         $z->set_syntax("xml");
         $z->set_element("f2o6locations");
         $rpn = "@and @attr 6=1 @attr 4=555 @attr 3=3 @attr 2=3 @attr BIB1 1=12 %s @attr 6=1 @attr 4=2 @attr 3=3 @attr 2=3 @attr BIB1 1=56 %s";
+/*
+        $rpn = "@attrset 1.2.840.10003.3.1000.105.3 @and @attr 1=2 %s @attr 1=1 %s";
+        $z->set_database($tgt["database"]."-locations");
+        $z->set_database($tgt["database"]."-xmllocations");
+        $z->set_element("mm_id");
+*/
         if (is_array($param->itemId))
           foreach ($param->itemId as $pid) $pids[] = $pid->_value;
         else
@@ -134,7 +140,7 @@ class openRuth extends webServiceServer {
             $res->agencyError->_value = "No holdings found";
           else {
             $rec = $z->z3950_record(1);
-//echo "rec: " . $rec . "\n";
+//echo "rec: " . $rec . "\n"; die();
             // clip holdings
             if (($p = strpos($rec, '<holdings>')) && ($p_end = strpos($rec, '</holdings>', $p)))
               $holdings = substr($rec, $p+11, $p_end - $p - 11);
@@ -155,7 +161,7 @@ class openRuth extends webServiceServer {
                       array("from" => "LIBRARYNO", "to" => "agencyHoldings"),
                       array("from" => "LIBRARYNAME", "to" => "agencyName"),
                       array("from" => "LIBRARYLONGNAME", "to" => "agencyFullName"),
-                      array("from" => "ATHOME", "to" => "copiesAvailableTotal"));
+                      array("from" => "ATHOME", "to" => "itemAvailability", "enum" => array("0" => "no copies exist", "1" => "no copies for loan", "2" => "no copies available, but item can be reserved", "3" => "copies available for loan and reservation")));
                     $this->move_tags($lib, $res_hold->_value->agencyHoldings->_value, $trans);
                     foreach ($lib->getElementsByTagName("PERIODICA") as $peri) {
                       $trans = array(
@@ -697,8 +703,8 @@ class openRuth extends webServiceServer {
               array("from" => "DisposalID", "to" => "orderId"),
               array("from" => "CreationDate", "to" => "orderDate", "date" => "swap"),
               array("from" => "Arrived", "to" => "orderArrived", "bool" => "y"),
-              array("from" => "LastUseDate", "to" => "orderLastInterstDate", "date" => "swap"),
-              array("from" => "Priority", "to" => "orderPriority"),
+              array("from" => "LastUseDate", "to" => "orderLastInterestDate", "date" => "swap"),
+              array("from" => "Priority", "to" => "orderPriority", "enum" => array("1" => "express", "2" => "high", "3" => "normal")),
               array("from" => "QueNumber", "to" => "orderQuePosition"),
               array("from" => "DisposalNote", "to" => "orderNote"),
               array("from" => "DisposalType", "to" => "orderType", "enum" => array("0" => "booking", "1" => "reservation", "2" => "ILL")));
@@ -762,11 +768,11 @@ class openRuth extends webServiceServer {
                                       "Afsendt" => "sent", 
                                       "Forfalden" => "due", 
                                       "Annuller fornyelse" => "cancel renewal")),
-              array("from" => "OrderDate", "to" => "illOrderDate"),
-              array("from" => "ExpectedDelivery", "to" => "orderExpectedAvailabilityDate"),
+              array("from" => "OrderDate", "to" => "illOrderDate", "date" => "swap"),
+              array("from" => "ExpectedDelivery", "to" => "orderExpectedAvailabilityDate", "date" => "swap"),
               array("from" => "DisposalID", "to" => "orderId"),
-              array("from" => "CreationDate", "to" => "orderDate"),
-              array("from" => "LastUseDate", "to" => "orderLastInterestDate"));
+              array("from" => "CreationDate", "to" => "orderDate", "date" => "swap"),
+              array("from" => "LastUseDate", "to" => "orderLastInterestDate", "date" => "swap"));
             foreach ($illloans->getElementsByTagName("ILLoan") as $l)
               $this->move_tags($l, $ill->illOrder[]->_value, $trans);
           } else
