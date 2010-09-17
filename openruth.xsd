@@ -607,7 +607,7 @@
 		</xs:annotation>
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element ref="or:booking" maxOccurs="unbounded"/>
+				<xs:element ref="or:booking" minOccurs="0" maxOccurs="unbounded"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
@@ -698,7 +698,7 @@
 		</xs:annotation>
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element ref="or:fine" maxOccurs="unbounded"/>
+				<xs:element ref="or:fine" minOccurs="0" maxOccurs="unbounded"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
@@ -731,10 +731,10 @@
 				<xs:element ref="or:itemTitle" minOccurs="0"/>
 				<xs:element ref="or:itemPublicationYear" minOccurs="0"/>
 				<xs:element ref="or:itemSerialPartTitle" minOccurs="0"/>
-				<xs:element ref="or:illProviderAgencyId"/>
+				<xs:element ref="or:illProviderAgencyId" minOccurs="0"/>
 				<xs:element ref="or:illStatus"/>
 				<xs:element ref="or:illOrderDate"/>
-				<xs:element ref="or:orderExpectedAvailabilityDate"/>
+				<xs:element ref="or:orderExpectedAvailabilityDate" minOccurs="0"/>
 				<xs:element ref="or:orderId"/>
 				<xs:element ref="or:orderDate"/>
 				<xs:element ref="or:orderLastInterestDate"/>
@@ -747,7 +747,7 @@
 		</xs:annotation>
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element ref="or:illOrder" maxOccurs="unbounded"/>
+				<xs:element ref="or:illOrder" minOccurs="0" maxOccurs="unbounded"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
@@ -971,10 +971,10 @@
 		</xs:annotation>
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element ref="or:renewAllLoansAllowed"/>
-				<xs:element ref="or:loanCategories" maxOccurs="unbounded"/>
+				<xs:element ref="or:renewAllLoansAllowed" minOccurs="0"/>
+				<xs:element ref="or:loanCategories" minOccurs="0" maxOccurs="unbounded"/>
 				<xs:element ref="or:loanRecallTypes" minOccurs="0" maxOccurs="unbounded"/>
-				<xs:element ref="or:loan" maxOccurs="unbounded"/>
+				<xs:element ref="or:loan" minOccurs="0" maxOccurs="unbounded"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
@@ -1331,7 +1331,7 @@
 				<xs:element ref="or:userFirstName"/>
 				<xs:element ref="or:userLastName"/>
 				<xs:element ref="or:userCategoryName"/>
-				<xs:element ref="or:userAddress"/>
+				<xs:element ref="or:userAddress" minOccurs="0"/>
 				<xs:element ref="or:userPostCode"/>
 				<xs:element ref="or:userCity"/>
 				<xs:element ref="or:userVillage" minOccurs="0"/>
@@ -1442,11 +1442,11 @@
 		<xs:complexType>
 			<xs:sequence>
 				<xs:element ref="or:userInfo"/>
-				<xs:element ref="or:fines" minOccurs="0"/>
-				<xs:element ref="or:loans" minOccurs="0"/>
-				<xs:element ref="or:orders" minOccurs="0"/>
-				<xs:element ref="or:bookings" minOccurs="0"/>
-				<xs:element ref="or:illOrders" minOccurs="0"/>
+				<xs:element ref="or:fines"/>
+				<xs:element ref="or:loans"/>
+				<xs:element ref="or:orders"/>
+				<xs:element ref="or:bookings"/>
+				<xs:element ref="or:illOrders"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
