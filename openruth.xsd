@@ -1013,9 +1013,9 @@
 			<xs:documentation xml:lang="en">date when an ordered item has been fetched for the user</xs:documentation>
 		</xs:annotation>
 	</xs:element>
-	<xs:element name="orderId" type="xs:dateTime">
+	<xs:element name="orderId" type="xs:string">
 		<xs:annotation>
-			<xs:documentation xml:lang="en">dateTime stamp serving as an unique local identifier of an order</xs:documentation>
+			<xs:documentation xml:lang="en">dateTime-like stamp serving as an unique local identifier of an order</xs:documentation>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="orderItem">
