@@ -453,7 +453,7 @@
 				<xs:element ref="or:agencyName"/>
 				<xs:element ref="or:agencyFullName"/>
 				<xs:element ref="or:agencyId"/>
-				<xs:element ref="or:copiesAvailableTotal"/>
+				<xs:element ref="or:itemAvailability"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
@@ -636,11 +636,6 @@
 			<xs:documentation xml:lang="en">Number of available copies of a given item</xs:documentation>
 		</xs:annotation>
 	</xs:element>
-	<xs:element name="copiesAvailableTotal" type="xs:integer">
-		<xs:annotation>
-			<xs:documentation xml:lang="en">Total number of copies of a given item available at an agency</xs:documentation>
-		</xs:annotation>
-	</xs:element>
 	<xs:element name="copiesCount" type="xs:integer">
 		<xs:annotation>
 			<xs:documentation xml:lang="en">Number of copies held at a given location</xs:documentation>
@@ -769,6 +764,11 @@
 	<xs:element name="itemAuthor" type="xs:string">
 		<xs:annotation>
 			<xs:documentation xml:lang="en">Author of an item (bibliographic info)</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="itemAvailability" type="or:itemAvailabilityType">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">Whether an item is available for loan, reservation etc.</xs:documentation>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="itemComingLocation">
@@ -1544,6 +1544,14 @@
 			<xs:enumeration value="sent"/>
 			<xs:enumeration value="due"/>
 			<xs:enumeration value="cancel renewal"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="itemAvailabilityType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="no copies exist"/>
+			<xs:enumeration value="no copies for loan"/>
+			<xs:enumeration value="no copies available, but item can be reserved"/>
+			<xs:enumeration value="copies available for loan and reservation"/>
 		</xs:restriction>
 	</xs:simpleType>
 	<xs:simpleType name="loanRecallTypeType">
