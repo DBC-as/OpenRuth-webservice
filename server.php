@@ -54,7 +54,8 @@ class openRuth extends webServiceServer {
       $res->agencyError->_value = "authentication_error";
     else {
       $targets = $this->config->get_value("ruth", "ztargets");
-      if ($tgt = $targets[$param->agencyId->_value]) {
+      $agencyId = $this->strip_agency($param->agencyId->_value);
+      if ($tgt = $targets[$agencyId]) {
         $z = new z3950();
         $z->set_target($tgt["host"]);
         $z->set_database($tgt["database"]."-libraryid");
@@ -62,7 +63,7 @@ class openRuth extends webServiceServer {
         $z->set_syntax("xml");
         $z->set_element("default");
         $rpn = "@attrset 1.2.840.10003.3.1000.105.3 @attr 1=1 %s";
-        $z->set_rpn(sprintf($rpn, $param->agencyId->_value));
+        $z->set_rpn(sprintf($rpn, $agencyId));
         $hits = $z->z3950_search($tgt["timeout"]);
         if ($err = $z->get_errno()) {
           $res->userError->_value = "cannot reach local system - (" . $err . ")";
@@ -79,9 +80,9 @@ class openRuth extends webServiceServer {
               array("from" => "LibraryNo", "to" => "agencyId"),
               array("from" => "LibraryName", "to" => "agencyName"),
               array("from" => "ResActivePeriode", "to" => "orderActivePeriod"));
-            $this->move_tags($bos, $res, $trans);
+            $this->move_tags($bos, $res->agencyCounters->_value, $trans);
             //$sc = &$res->agencyCounterInfo->_value;
-            $sc = &$res;
+            $sc = &$res->agencyCounters->_value;
             $trans = array(
               array("from" => "ServiceCounter", "to" => "agencyCounter"),
               array("from" => "ServiceCounterName", "to" => "agencyCounterName"),
@@ -103,54 +104,121 @@ class openRuth extends webServiceServer {
   /** \brief 
    */
   function holdings($param) { 
-// URL_ITEMORDER_BESTIL
-//   $search["syntax"]  = "xml";
-//  $search["element"] = "B3";
-//  $search["schema"]  = "1.2.840.10003.13.7.2";
-
     if (!$this->aaa->has_right("openruth", 500))
       $res->agencyError->_value = "authentication_error";
     else {
-      $res->bookingError->_value = "not implemented yet";
-/*
       $targets = $this->config->get_value("ruth", "ztargets");
-      if ($tgt = $targets[$param->agencyId->_value]) {
+      $agencyId = $this->strip_agency($param->agencyId->_value);
+      if ($tgt = $targets[$agencyId]) {
         $z = new z3950();
         $z->set_target($tgt["host"]);
-        //$z->set_database($tgt["database"]."-ophelia");
-        $z->set_database($tgt["database"]."-titles");
+        $z->set_database($tgt["database"]."-ophelia");
         $z->set_authentication($tgt["authentication"]);
         $z->set_syntax("xml");
-        $z->set_element("B3");
-        //$z->set_schema("1.2.840.10003.13.7.2");
-        //$rpn = "@attr 4=103 @attr BIB1 1=12 %s";
-        //$z->set_rpn(sprintf($rpn, $param->itemId[0]->_value));
-        $rpn = "@attrset 1.2.840.10003.3.1000.105.3 @and @attr 1=1 %s @attr 1=2 %s";
-        $z->set_rpn(sprintf($rpn, $param->agencyId->_value, $param->itemId[0]->_value));
-        $hits = $z->z3950_search($tgt["timeout"]);
-echo "hits: " . $hits . "\n";
-echo "err: " . $z->get_errno() . "\n";
-        if ($err = $z->get_errno()) {
-          $res->agencyError->_value = "cannot reach local system - (" . $err . ")";
-        } elseif (empty($hits))
-          $res->agencyError->_value = "No holdings found";
-        else {
-          $rec = $z->z3950_record();
-echo "rec: " . $rec . "\n";
-          $dom = new DomDocument();
-          $dom->preserveWhiteSpace = false;
-          if ($dom->loadXML($rec)) {
-            $hs = &$dom->getElementsByTagName("BorrowerStatus")->item(0);
-          } else
-            $res->userError->_value = "cannot decode answer";
+        $z->set_element("f2o6locations");
+        $rpn = "@and @attr 6=1 @attr 4=555 @attr 3=3 @attr 2=3 @attr BIB1 1=12 %s @attr 6=1 @attr 4=2 @attr 3=3 @attr 2=3 @attr BIB1 1=56 %s";
+        if (is_array($param->itemId))
+          foreach ($param->itemId as $pid) $pids[] = $pid->_value;
+        else
+          $pids[] =$param->itemId->_value;
+        foreach ($pids as $pid) {
+          $z->set_rpn(sprintf($rpn, $pid, $agencyId));
+          $hits = $z->z3950_search($tgt["timeout"]);
+//echo "hits: " . $hits . "\n";
+          if ($hits > 1)
+            verbose::log(ERROR, "holdings(" . __LINE__ . "):: More than one hits searching for id: " . $pid . " and agency: " . $agencyId);
+//echo "err: " . $z->get_errno() . "\n";
+          if ($err = $z->get_errno()) {
+            $res->agencyError->_value = "cannot reach local system - (" . $err . ")";
+          } elseif (empty($hits))
+            $res->agencyError->_value = "No holdings found";
+          else {
+            $rec = $z->z3950_record(1);
+//echo "rec: " . $rec . "\n";
+            // clip holdings
+            if (($p = strpos($rec, '<holdings>')) && ($p_end = strpos($rec, '</holdings>', $p)))
+              $holdings = substr($rec, $p+11, $p_end - $p - 11);
+            else
+              $holdings = '<HOLDINGS><HOLDING><IDNR>' . $pid . '</IDNR></HOLDING></HOLDINGS>';
+//echo "holdings: /" . $holdings . "/\n";
+            $dom = new DomDocument();
+            $dom->preserveWhiteSpace = false;
+            if ($dom->loadXML($holdings)) {
+              foreach ($dom->getElementsByTagName("HOLDING") as $hold) {
+                $trans = array(
+                  array("from" => "IDNR", "to" => "itemId"),
+                  array("from" => "PIFNOTE", "to" => "holdingNote"));
+                $this->move_tags($hold, $res_hold->_value, $trans);
+                foreach ($hold->getElementsByTagName("LIBRARY") as $lib) {
+                  if ($lib->getElementsByTagName("LIBRARYNO")->item(0)->nodeValue == $agencyId) {
+                    $trans = array(
+                      array("from" => "LIBRARYNO", "to" => "agencyHoldings"),
+                      array("from" => "LIBRARYNAME", "to" => "agencyName"),
+                      array("from" => "LIBRARYLONGNAME", "to" => "agencyFullName"),
+                      array("from" => "ATHOME", "to" => "copiesAvailableTotal"));
+                    $this->move_tags($lib, $res_hold->_value->agencyHoldings->_value, $trans);
+                    foreach ($lib->getElementsByTagName("PERIODICA") as $peri) {
+                      $trans = array(
+                        array("from" => "TITLEPARTNO", "to" => "itemSerialPartId"),
+                        array("from" => "VOLUME", "to" => "itemSerialPartVolume"),
+                        array("from" => "NUMBER", "to" => "itemSerialPartIssue"),
+                        array("from" => "RESERVATIONS", "to" => "ordersCount"),
+                        array("from" => "BOOKINGS", "to" => "bookingsCount"),
+                        array("from" => "EXPECTEDDISPATCHDATE", "to" => "itemExpectedAvailabilityDate", "date" => "swap"));
+                      $this->move_tags($peri, $res_item->_value, $trans);
+                      //if ($peri->getElementsByTagName("LOCATION")->item(0)) echo "LOCATION";
+                      //if ($peri->getElementsByTagName("LOCATIONCOMMING")->item(0)) echo "LOCATIONCOMMING";
+                      if ($location = $peri->getElementsByTagName("LOCATION")->item(0))
+                        $res_loc = &$res_item->_value->itemLocation->_value;
+                      elseif ($location = $peri->getElementsByTagName("LOCATIONCOMMING")->item(0))
+                        $res_loc = &$res_item->_value->itemCommingLocation->_value;
+                      if (isset($res_item)) {
+                        $trans = array(
+                          array("from" => "MMCOLLECTION", "from_attr" => "BOOKINGALLOWED", "to" => "bookingAllowed", "bool" => "y"),
+                          array("from" => "MMCOLLECTION", "from_attr" => "RESERVATIONALLOWED", "to" => "orderAllowed", "bool" => "y"),
+                          array("from" => "HOME", "to" => "copiesAvailableCount"));
+                        $this->move_tags($location, $res_loc, $trans);
+                        $trans = array(
+                          array("from" => "MMCOLLECTION", "to" => "agencyCollectionCode"),
+                          array("from" => "MMCOLLECTION", "from_attr" => "CODE", "to" => "agencyCollectionName"));
+                        $this->move_tags($location, $res_loc->agencyCollectionId->_value, $trans);
+                        $trans = array(
+                          array("from" => "BRANCH", "to" => "agencyBranchCode"),
+                          array("from" => "BRANCH", "from_attr" => "CODE", "to" => "agencyBranchName"));
+                        $this->move_tags($location, $res_loc->agencyBranchId->_value, $trans);
+                        $trans = array(
+                          array("from" => "DEPARTMENT", "to" => "agencyDepartmentCode"),
+                          array("from" => "DEPARTMENT", "from_attr" => "CODE", "to" => "agencyDepartmentName"));
+                        $this->move_tags($location, $res_loc->agencyDepartmentId->_value, $trans);
+                        $trans = array(
+                          array("from" => "PLACEMENT", "to" => "agencyPlacementCode"),
+                          array("from" => "PLACEMENT", "from_attr" => "CODE", "to" => "agencyPlacementName"));
+                        $this->move_tags($location, $res_loc->agencyPlacementId->_value, $trans);
+                        $trans = array(
+                          array("from" => "TOTAL", "to" => "copiesCount"),
+                          array("from" => "DELIVERYDATE", "to" => "itemExpectedDelivery", "date" => "swap"));
+                        $this->move_tags($location, $res_loc, $trans);
+                        $res_hold->_value->itemHoldings[] = $res_item;
+                        unset($res_loc);
+                        unset($res_item);
+                      }
+                    }
+                  }
+                }
+                $res->holding[] = $res_hold;
+                //print_r($res_hold);
+                unset($res_hold);
+              }
+            } else
+              $res->agencyError->_value = "cannot decode answer";
+          }
         }
       } else
-        $res->userError->_value = "unknown agencyId";
-*/
+        $res->agencyError->_value = "unknown agencyId";
     }
 
     $ret->holdingsResponse->_value = $res;
-    //var_dump($param); var_dump($res); die();
+    //var_dump($param); print_r($res); die();
     return $ret;
   }
 
@@ -251,10 +319,11 @@ echo "rec: " . $rec . "\n";
       $res->orderItemError->_value = "authentication_error";
     else {
       $targets = $this->config->get_value("ruth", "ztargets");
-      if ($tgt = $targets[$param->agencyId->_value]) {
+      $agencyId = $this->strip_agency($param->agencyId->_value);
+      if ($tgt = $targets[$agencyId]) {
     // build order
         $ord = &$order->Reservation->_value;
-        $ord->LibraryNo->_value = $param->agencyId->_value;
+        $ord->LibraryNo->_value = $agencyId;
         $ord->BorrowerTicketNo->_value = $param->userId->_value;
         $ord->DisposalNote->_value = $param->orderNote->_value;
         $ord->LastUseDate->_value = sprintf("%02d-%02d-%04d", 
@@ -262,19 +331,23 @@ echo "rec: " . $rec . "\n";
                                             substr($param->orderLastInterestDate->_value, 5, 2), 
                                             substr($param->orderLastInterestDate->_value, 0, 4));
         $ord->ServiceCounter->_value = $param->agencyCounter->_value;
-        $ord->Override->_value = ($param->agencyCounter->_value == "TRUE" ? "Y" : "N");
+        $ord->Override->_value = ($this->xs_true($param->agencyCounter->_value) ? "Y" : "N");
         $ord->Priority->_value = $param->orderPriority->_value;
         // ?????? $ord->DisposalType->_value = $param->xxxx->_value;
-        if (is_array($param->orderItemId))
-          foreach ($param->orderItemId as $oid) {
-            $ord->MRIDS->_value->MRID[]->_value->ID->_value = $oid->_value;
-            $ord->MRIDS->_value->MRID[]->_value->TitlePartNo->_value = 0;
+        $itemIds = &$param->orderItemId;
+        if (is_array($itemIds))
+          foreach ($itemIds as $oid) {
+            $mrid->ID->_value = $oid->_value->itemId->_value;
+            if (!$mrid->TitlePartNo->_value = $oid->_value->itemSerialPartId->_value)
+              $mrid->TitlePartNo->_value = 0;
+            $ord->MRIDS->_value->MRID[]->_value = $mrid;
           }
         else {
-          $ord->MRIDS->_value->MRID->_value->ID->_value = $param->orderItemId->_value;
-          $ord->MRIDS->_value->MRID->_value->TitlePartNo->_value = 0;
+          $mrid->ID->_value = $itemIds->_value->itemId->_value;
+          if (!$mrid->TitlePartNo->_value = $itemIds->_value->itemSerialPartId->_value)
+            $mrid->TitlePartNo->_value = 0;
+          $ord->MRIDS->_value->MRID->_value = $mrid;
         }
-        // ??????? TitlePartNo together with ID ???????
         $xml = '<?xml version="1.0" encoding="UTF-8"?'.'>' . $this->objconvert->obj2xml($order);
         
 //print_r($ord);
@@ -312,7 +385,7 @@ echo "rec: " . $rec . "\n";
                     default     : $ir->orderItemError->_value = "unknown error: " . $mrid->nodeValue; break;
                   }
                 else
-                  $ir->orderItemOk->_value = "TRUE";
+                  $ir->orderItemOk->_value = "true";
                 $res->orderItem[]->_value = $ir;
               }
             }
@@ -417,7 +490,8 @@ echo "rec: " . $rec . "\n";
       $res->agencyError->_value = "authentication_error";
     else {
       $targets = $this->config->get_value("ruth", "ztargets");
-      if ($tgt = $targets[$param->agencyId->_value]) {
+      $agencyId = $this->strip_agency($param->agencyId->_value);
+      if ($tgt = $targets[$agencyId]) {
         $z = new z3950();
         $z->set_target($tgt["host"]);
         $z->set_database($tgt["database"]."-borrowercheck");
@@ -425,7 +499,7 @@ echo "rec: " . $rec . "\n";
         $z->set_syntax("xml");
         $z->set_element("test");
         $rpn = "@attrset 1.2.840.10003.3.1000.105.3 @and @attr 1=1 %s @and @attr 1=4 %s @attr 1=5 %s";
-        $z->set_rpn(sprintf($rpn, $param->agencyId->_value, $param->userId->_value, $param->userPinCode->_value));
+        $z->set_rpn(sprintf($rpn, $agencyId, $param->userId->_value, $param->userPinCode->_value));
         $hits = $z->z3950_search($tgt["timeout"]);
 //var_dump($hits);
 //var_dump($z->get_errno());
@@ -457,7 +531,7 @@ echo "rec: " . $rec . "\n";
               array("from" => "BirthYear", "to" => "userBirthYear"),
               array("from" => "Sex", "to" => "userSex", "enum" => array("b" => "male", "g" => "female", "u" => unknown)),
               array("from" => "userAge", "to" => "Age"));
-            $this->move_tags($chk, $res, $trans);
+            $this->move_tags($chk, $res->userCheck->_value, $trans);
           } else
             $res->userError->_value = "cannot decode answer";
         }
@@ -491,7 +565,8 @@ echo "rec: " . $rec . "\n";
       $res->userError->_value = "authentication_error";
     else {
       $targets = $this->config->get_value("ruth", "ztargets");
-      if ($tgt = $targets[$param->agencyId->_value]) {
+      $agencyId = $this->strip_agency($param->agencyId->_value);
+      if ($tgt = $targets[$agencyId]) {
         $z = new z3950();
         $z->set_target($tgt["host"]);
         $z->set_database($tgt["database"]."-borrowerstatus");
@@ -499,7 +574,7 @@ echo "rec: " . $rec . "\n";
         $z->set_syntax("xml");
         $z->set_element("default");
         $rpn = "@attrset 1.2.840.10003.3.1000.105.3 @and @attr 1=1 %s @and @attr 1=4 %s @attr 1=5 %s";
-        $z->set_rpn(sprintf($rpn, $param->agencyId->_value, $param->userId->_value, $param->userPinCode->_value));
+        $z->set_rpn(sprintf($rpn, $agencyId, $param->userId->_value, $param->userPinCode->_value));
         $hits = $z->z3950_search($tgt["timeout"]);
         if ($err = $z->get_errno()) {
           if ($err == 1103) $res->userError->_value = "unknown userId";
@@ -515,7 +590,7 @@ echo "rec: " . $rec . "\n";
           if ($dom->loadXML($rec)) {
         // userInfo
             $loaner = &$dom->getElementsByTagName("Loaner")->item(0);
-            $ui = &$res->userInfo->_value;
+            $ui = &$res->userStatus->_value->userInfo->_value;
             $trans = array(
               array("from" => "FirstName", "to" => "userFirstName"),
               array("from" => "LastName", "to" => "userLastName"),
@@ -540,14 +615,14 @@ echo "rec: " . $rec . "\n";
             $this->move_tags($loaner, $ui, $trans);
 
         // fines
-            $fi = &$res->fines->_value;
+            $fi = &$res->userStatus->_value->fines->_value;
             $trans = array(
               array("from" => "ServiceDate", "to" => "fineDate", "date" => "swap"),
               array("from" => "ServiceCounter", "to" => "agencyCounter"),
               array("from" => "Title", "to" => "itemDisplayTitle"),
               array("from" => "Amount", "to" => "fineAmount"),
               array("from" => "Payed", "to" => "fineAmountPaid"),
-              array("from" => "ServiceType", "to" => "fineType", "enum" => array("Late" => "late", "Recall1" => "first recall", "Recall2" => "second recall", "Recall3" => "third recall", "Compensation" => "compensation")),
+              array("from" => "ServiceType", "to" => "fineType", "enum" => array("Recall1" => "first recall", "Recall2" => "second recall", "Recall3" => "third recall", "Compensation" => "compensation")),
               array("from" => "InvoiceNo", "to" => "fineInvoiceNumber"));
             foreach ($dom->getElementsByTagName("Fines") as $fines)
               foreach ($fines->getElementsByTagName("Fine") as $fine)
@@ -555,7 +630,7 @@ echo "rec: " . $rec . "\n";
             
 
         // loans
-            $los = &$res->loans->_value;
+            $los = &$res->userStatus->_value->loans->_value;
             $loans = &$dom->getElementsByTagName("Loans")->item(0);
             $trans = array(
               array("from" => "RenewChecked", "to" => "renewAllLoansAllowed", "bool" => "y"));
@@ -565,7 +640,7 @@ echo "rec: " . $rec . "\n";
               array("from" => "LoanCat", "to" => "loanCategory"),
               array("from" => "MatAtHome", "to" => "loanCategoryCount"));
             $trans_2 = array(
-              array("from" => "RecallType", "to" => "loanRecallType"),
+              array("from" => "RecallType", "to" => "loanRecallType", "enum" => array("Late" => "late", "Recall1" => "first recall", "Recall2" => "second recall", "Recall3" => "third recall", "Compensation" => "compensation")),
               array("from" => "Number", "to" => "loanRecallTypeCount "));
             foreach ($dom->getElementsByTagName("Status") as $status) {
               foreach ($status->getElementsByTagName("CategoryLoans") as $c_los)
@@ -583,14 +658,14 @@ echo "rec: " . $rec . "\n";
               array("from" => "Returndate", "to" => "loanReturnDate", "date" => "swap"),
               array("from" => "LastRenewal", "to" => "loanLastRenewedDate", "date" => "swap"),
               array("from" => "LoanStatus", "to" => "loanStatus"),
-              array("from" => "RecallType", "to" => "loanRecallType"),
+              array("from" => "RecallType", "to" => "loanRecallType", "enum" => array("Late" => "late", "Recall1" => "first recall", "Recall2" => "second recall", "Recall3" => "third recall", "Compensation" => "compensation")),
               array("from" => "RecallDate", "to" => "loanRecallDate", "date" => "swap"),
               array("from" => "CanRenew", "to" => "loanRenewable", "enum" => array("0" => "renewable", "1" => "not renewable", "2" => "ILL, renewable", "3" => "ILL, not renewable")));
             foreach ($loans->getElementsByTagName("Loan") as $loan)
               $this->move_tags($loan, $los->loan[]->_value, $trans);
 
         // orders
-            $ord = &$res->orders->_value;
+            $ord = &$res->userStatus->_value->orders->_value;
             $reservations = &$dom->getElementsByTagName("Reservations")->item(0);
             $rsr = &$reservations->getElementsByTagName("ReservationsReady")->item(0);
             $trans = array(
@@ -603,7 +678,7 @@ echo "rec: " . $rec . "\n";
               array("from" => "CollectDate", "to" => "orderPickUpDate", "date" => "swap"),
               array("from" => "RetainedDate", "to" => "orderFetchedDate", "date" => "swap"),
               array("from" => "CollectNo", "to" => "orderPickUpId"),
-              array("from" => "DisposalId", "to" => "orderId"),
+              array("from" => "DisposalID", "to" => "orderId"),
               array("from" => "CreationDate", "to" => "orderDate", "date" => "swap"),
               array("from" => "Arrived", "to" => "orderArrived", "bool" => "y"));
             foreach ($rsr->getElementsByTagName("ReservationReady") as $r)
@@ -619,7 +694,7 @@ echo "rec: " . $rec . "\n";
               array("from" => "CollectDate", "to" => "orderPickUpDate", "date" => "swap"),
               array("from" => "RetainedDate", "to" => "orderFetchedDate", "date" => "swap"),
               array("from" => "CollectNo", "to" => "orderPickUpId"),
-              array("from" => "DisposalId", "to" => "orderId"),
+              array("from" => "DisposalID", "to" => "orderId"),
               array("from" => "CreationDate", "to" => "orderDate", "date" => "swap"),
               array("from" => "Arrived", "to" => "orderArrived", "bool" => "y"),
               array("from" => "LastUseDate", "to" => "orderLastInterstDate", "date" => "swap"),
@@ -631,7 +706,7 @@ echo "rec: " . $rec . "\n";
               $this->move_tags($r, $ord->ordersNotReady[]->_value, $trans);
 
         // bookings
-            $book = &$res->bookings->_value;
+            $book = &$res->userStatus->_value->bookings->_value;
             $bookings = &$dom->getElementsByTagName("Bookings")->item(0);
             $trans = array(
               array("from" => "BookingId", "to" => "bookingId"),
@@ -658,7 +733,7 @@ echo "rec: " . $rec . "\n";
 
         // illOrders
             $illloans = &$dom->getElementsByTagName("ILLoans")->item(0);
-            $ill = &$res->illOrders->_value;
+            $ill = &$res->userStatus->_value->illOrders->_value;
             $trans = array(
               array("from" => "Title", "to" => "itemDisplayTitle"),
               array("from" => "NCIP-Author", "to" => "itemAuthor"),
@@ -689,11 +764,11 @@ echo "rec: " . $rec . "\n";
                                       "Annuller fornyelse" => "cancel renewal")),
               array("from" => "OrderDate", "to" => "illOrderDate"),
               array("from" => "ExpectedDelivery", "to" => "orderExpectedAvailabilityDate"),
-              array("from" => "DisposalId", "to" => "orderId"),
+              array("from" => "DisposalID", "to" => "orderId"),
               array("from" => "CreationDate", "to" => "orderDate"),
               array("from" => "LastUseDate", "to" => "orderLastInterestDate"));
             foreach ($illloans->getElementsByTagName("ILLoan") as $l)
-              $this->move_tags($l, $ord->illOrder[]->_value, $trans);
+              $this->move_tags($l, $ill->illOrder[]->_value, $trans);
           } else
             $res->userError->_value = "cannot decode answer";
 
@@ -726,15 +801,18 @@ echo "rec: " . $rec . "\n";
   private function move_tags(&$from, &$to, &$tags) {
     foreach ($tags as $tag) 
       foreach ($from->getElementsByTagName($tag["from"]) as $node) {
-        $node_val = $node->nodeValue;
+        if ($tag["from_attr"])
+          $node_val = $node->getAttribute($tag["from_attr"]);
+        else
+          $node_val = $node->nodeValue;
         if ($tag["bool"])
-          $to->{$tag["to"]}[]->_value = ($node_val == $tag["bool"] ? "TRUE" : "FALSE");
+          $to->{$tag["to"]}[]->_value = ($node_val == $tag["bool"] ? "true" : "false");
         elseif ($tag["enum"] && isset($tag["enum"][$node_val]))
           $to->{$tag["to"]}[]->_value = $tag["enum"][$node_val];
         elseif ($tag["obligatory"])
           $to->{$tag["to"]}[]->_value = $node_val;
         elseif ($node_val)
-          if ($tag["date"] == "swap")
+          if ($tag["date"] == "swap" && substr($node_val, 2, 1) == "-" && substr($node_val, 5, 1) == "-")
             $to->{$tag["to"]}[]->_value = substr($node_val, 6) . "-" . 
                                           substr($node_val, 3, 2) . "-" . 
                                           substr($node_val, 0, 2);
@@ -742,6 +820,21 @@ echo "rec: " . $rec . "\n";
             $to->{$tag["to"]}[]->_value = $node_val;
       }
   }
+
+ /** \brief
+  *  return only digits, so something like DK-710100 returns 710100
+  */
+  private function strip_agency($id) {
+    return preg_replace('/\D/', '', $id);
+  }
+
+ /** \brief
+  *  return true for xs:boolean
+  */
+  private function xs_true($xs_bool) {
+    return ($xs_bool == "1" || strtoupper($xs_bool) == "TRUE");
+  }
+
 
 }
 
