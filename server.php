@@ -116,17 +116,11 @@ class openRuth extends webServiceServer {
       if ($tgt = $targets[$agencyId]) {
         $z = new z3950();
         $z->set_target($tgt["host"]);
-        $z->set_database($tgt["database"]."-ophelia");
+        $z->set_database($tgt["database"]."-xmllocations");
         $z->set_authentication($tgt["authentication"]);
         $z->set_syntax("xml");
-        $z->set_element("f2o6locations");
-        $rpn = "@and @attr 6=1 @attr 4=555 @attr 3=3 @attr 2=3 @attr BIB1 1=12 %s @attr 6=1 @attr 4=2 @attr 3=3 @attr 2=3 @attr BIB1 1=56 %s";
-/*
-        $rpn = "@attrset 1.2.840.10003.3.1000.105.3 @and @attr 1=2 %s @attr 1=1 %s";
-        $z->set_database($tgt["database"]."-locations");
-        $z->set_database($tgt["database"]."-xmllocations");
         $z->set_element("mm_id");
-*/
+        $rpn = "@attrset 1.2.840.10003.3.1000.105.3 @and @attr 1=2 %s @attr 1=1 %s";
         if (is_array($param->itemId))
           foreach ($param->itemId as $pid) $pids[] = $pid->_value;
         else
@@ -146,14 +140,8 @@ class openRuth extends webServiceServer {
             $res->agencyError->_value = "No holdings found";
           else {
             $this->watch->start("zrecord");
-            $rec = $z->z3950_record(1);
+            $holdings = $z->z3950_record(1);
             $this->watch->stop("zrecord");
-//echo "rec: " . $rec . "\n"; die();
-            // clip holdings
-            if (($p = strpos($rec, '<holdings>')) && ($p_end = strpos($rec, '</holdings>', $p)))
-              $holdings = substr($rec, $p+11, $p_end - $p - 11);
-            else
-              $holdings = '<HOLDINGS><HOLDING><IDNR>' . $pid . '</IDNR></HOLDING></HOLDINGS>';
 //echo "holdings: /" . $holdings . "/\n";
             $dom = new DomDocument();
             $dom->preserveWhiteSpace = false;
@@ -166,7 +154,7 @@ class openRuth extends webServiceServer {
                 foreach ($hold->getElementsByTagName("LIBRARY") as $lib) {
                   if ($lib->getElementsByTagName("LIBRARYNO")->item(0)->nodeValue == $agencyId) {
                     $trans = array(
-                      array("from" => "LIBRARYNO", "to" => "agencyHoldings"),
+                      array("from" => "LIBRARYNO", "to" => "agencyId"),
                       array("from" => "LIBRARYNAME", "to" => "agencyName"),
                       array("from" => "LIBRARYLONGNAME", "to" => "agencyFullName"),
                       array("from" => "ATHOME", "to" => "itemAvailability", "enum" => array("0" => "no copies exist", "1" => "no copies for loan", "2" => "no copies available, but item can be reserved", "3" => "copies available for loan and reservation")));
@@ -185,12 +173,11 @@ class openRuth extends webServiceServer {
                       if ($location = $peri->getElementsByTagName("LOCATION")->item(0))
                         $res_loc = &$res_item->_value->itemLocation->_value;
                       elseif ($location = $peri->getElementsByTagName("LOCATIONCOMMING")->item(0))
-                        $res_loc = &$res_item->_value->itemCommingLocation->_value;
+                        $res_loc = &$res_item->_value->itemComingLocation->_value;
                       if (isset($res_item)) {
                         $trans = array(
                           array("from" => "MMCOLLECTION", "from_attr" => "BOOKINGALLOWED", "to" => "bookingAllowed", "bool" => "y"),
-                          array("from" => "MMCOLLECTION", "from_attr" => "RESERVATIONALLOWED", "to" => "orderAllowed", "bool" => "y"),
-                          array("from" => "HOME", "to" => "copiesAvailableCount"));
+                          array("from" => "MMCOLLECTION", "from_attr" => "RESERVATIONALLOWED", "to" => "orderAllowed", "bool" => "y"));
                         $this->move_tags($location, $res_loc, $trans);
                         $trans = array(
                           array("from" => "MMCOLLECTION", "to" => "agencyCollectionCode"),
@@ -209,6 +196,7 @@ class openRuth extends webServiceServer {
                           array("from" => "PLACEMENT", "from_attr" => "CODE", "to" => "agencyPlacementName"));
                         $this->move_tags($location, $res_loc->agencyPlacementId->_value, $trans);
                         $trans = array(
+                          array("from" => "HOME", "to" => "copiesAvailableCount"),
                           array("from" => "TOTAL", "to" => "copiesCount"),
                           array("from" => "DELIVERYDATE", "to" => "itemExpectedDelivery", "date" => "swap"));
                         $this->move_tags($location, $res_loc, $trans);
@@ -377,7 +365,7 @@ class openRuth extends webServiceServer {
           $dom->preserveWhiteSpace = false;
           if ($dom->loadXML($xml_ret["xmlUpdateDoc"])) {
             if ($err = &$dom->getElementsByTagName("ErrorResponse")->item(0)) {
-              verbose::log(ERROR, "ES order errno: " . $err->getAttribute("Err") . 
+              verbose::log(ERROR, "ES order (" . __LINE__ . ") errno: " . $err->getAttribute("Err") . 
                                   " error: " . $err->nodeValue);
               $res->orderItemError->_value = "unspecified error, order not possible";
             } else {
@@ -405,7 +393,7 @@ class openRuth extends webServiceServer {
             }
           }
         } else {
-          verbose::log(ERROR, "ES order z-errno: " . $z->get_error_string());
+          verbose::log(ERROR, "ES order (" . __LINE__ . ") z-errno: " . $z->get_error_string());
           $res->orderItemError->_value = "system error";
         }
 //echo "\n";
@@ -475,11 +463,68 @@ class openRuth extends webServiceServer {
     if (!$this->aaa->has_right("openruth", 500))
       $res->renewLoanError->_value = "authentication_error";
     else {
-      $res->renewLoanError->_value = "not implemented yet";
+      $agencyId = $this->strip_agency($param->agencyId->_value);
+      $targets = $this->config->get_value("ruth", "ztargets");
+      if ($tgt = $targets[$agencyId]) {
+        $renewal = &$renew->Renewal->_value;
+        $renewal->LibraryNo->_value = $agencyId;
+        $renewal->BorrowerTicketNo->_value = $param->userId->_value;
+        if (is_array($param->copyId))
+          foreach ($param->copyId as $copyId)
+            $renewal->CopyNos->_value->CopyNo[]->_value = $copyId->_value;
+        else
+          $renewal->CopyNos->_value->CopyNo->_value = $param->copyId->_value;
+        $xml = '<?xml version="1.0" encoding="UTF-8"?'.'>' . $this->objconvert->obj2xml($renew);
+        $z = new z3950();
+        $z->set_target($tgt["host"]);
+        $z->set_database($tgt["database"]."-ophelia");
+        $z->set_authentication($tgt["authentication"]);
+        $xml_ret = $z->z3950_xml_update($xml, $tgt["timeout"]);
+//echo "error: " . $z->get_errno();
+//print_r($xml);
+//print_r($xml_ret);
+        if ($z->get_errno() == 0 && $xml_ret["xmlUpdateDoc"]) {
+          $dom = new DomDocument();
+          $dom->preserveWhiteSpace = false;
+          if ($dom->loadXML($xml_ret["xmlUpdateDoc"])) {
+            $errs = array("1030" => "rejected", 
+                          "1031" => "reserved",
+                          "1032" => "booked",
+                          "1033" => "copy reserved",
+                          "1034" => "user is blocked",
+                          "1035" => "copy not on loan by user",
+                          "1036" => "copy not on loan",
+                          "1037" => "copy does not exist",
+                          "1038" => "ILL, not renewable");
+            if ($err = $dom->getElementsByTagName("BorrowerError")->item(0)) {
+              verbose::log(ERROR, "ES order (" . __LINE__ . ") errno: " . $err->nodeValue);
+              if (!($res->renewLoanError->_value = $errs[$err->nodeValue])) 
+                $res->renewLoanError->_value = "unspecified error (" . $err->nodeValue . "), order not possible";
+            } else {
+              foreach ($dom->getElementsByTagName("CopyNoStatus") as $cns) {
+                $rl->copyId->_value = $cns->getAttribute("CopyNo");
+                if (!$cns->nodeValue)
+                  $rl->renewLoanOk->_value = "true";
+                elseif (!($rl->renewLoanError->_value = $errs[$cns->nodeValue])) 
+                  $rl->renewLoanError->_value = "unspecified error (" . $cns->nodeValue . "), order not possible";
+                $res->renewLoan[]->_value = $rl;
+                unset($rl);
+              }
+            }
+          } else {
+            verbose::log(ERROR, "ES order (" . __LINE__ . ") loadXML error of: " . $xml_ret["xmlUpdateDoc"]);
+            $res->renewLoanError->_value = "system error";
+          }
+        } else {
+          verbose::log(ERROR, "ES order (" . __LINE__ . ") z-errno: " . $z->get_error_string());
+          $res->renewLoanError->_value = "system error";
+        }
+      } else
+        $res->renewLoanError->_value = "unknown agencyId";
     }
 
     $ret->renewLoanResponse->_value = $res;
-    //var_dump($param); var_dump($res); die();
+    //print_r($param); print_r($res); die();
     return $ret;
   }
 
@@ -677,7 +722,7 @@ class openRuth extends webServiceServer {
               array("from" => "NCIP-PublicationDate", "to" => "itemPublicationYear"),
               array("from" => "CopyNo", "to" => "copyId"),
               array("from" => "LoanDate", "to" => "loanDate", "date" => "swap"),
-              array("from" => "Returndate", "to" => "loanReturnDate", "date" => "swap"),
+              array("from" => "ReturnDate", "to" => "loanReturnDate", "date" => "swap"),
               array("from" => "LastRenewal", "to" => "loanLastRenewedDate", "date" => "swap"),
               array("from" => "LoanStatus", "to" => "loanStatus"),
               array("from" => "RecallType", "to" => "loanRecallType", "enum" => array("Late" => "late", "Recall1" => "first recall", "Recall2" => "second recall", "Recall3" => "third recall", "Compensation" => "compensation")),
@@ -833,7 +878,7 @@ class openRuth extends webServiceServer {
           $to->{$tag["to"]}[]->_value = $tag["enum"][$node_val];
         elseif ($tag["obligatory"])
           $to->{$tag["to"]}[]->_value = $node_val;
-        elseif ($node_val)
+        elseif ($node_val <> NULL)
           if ($tag["date"] == "swap" && substr($node_val, 2, 1) == "-" && substr($node_val, 5, 1) == "-")
             $to->{$tag["to"]}[]->_value = substr($node_val, 6) . "-" . 
                                           substr($node_val, 3, 2) . "-" . 
