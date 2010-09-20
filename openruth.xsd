@@ -1608,6 +1608,7 @@
 	</xs:simpleType>
 	<xs:simpleType name="renewLoanErrorType">
 		<xs:restriction base="xs:string">
+			<xs:enumeration value="unknown agencyId"/>
 			<xs:enumeration value="rejected"/>
 			<xs:enumeration value="reserved"/>
 			<xs:enumeration value="booked"/>
