@@ -560,6 +560,7 @@
 		<xs:complexType>
 			<xs:sequence>
 				<xs:element ref="or:bookingInfoTotalCount"/>
+				<xs:element ref="or:bookingNote" minOccurs="0"/>
 				<xs:element ref="or:bookingChange" maxOccurs="unbounded"/>
 			</xs:sequence>
 		</xs:complexType>
@@ -1491,6 +1492,7 @@
 		<xs:restriction base="xs:string">
 			<xs:enumeration value="no agencyId supplied"/>
 			<xs:enumeration value="unknown agencyId"/>
+			<xs:enumeration value="no booking found"/>
 			<xs:enumeration value="no itemId, titlePartNo or bookingId supplied"/>
 			<xs:enumeration value="overbooking"/>
 			<xs:enumeration value="counter does not exist"/>
@@ -1500,6 +1502,7 @@
 			<xs:enumeration value="number of fetched copies exceeds number of ordered copies"/>
 			<xs:enumeration value="booking can not be deleted"/>
 			<xs:enumeration value="undefined error"/>
+			<xs:enumeration value="cannot reach local system"/>
 		</xs:restriction>
 	</xs:simpleType>
 	<xs:simpleType name="cancelOrderErrorType">
