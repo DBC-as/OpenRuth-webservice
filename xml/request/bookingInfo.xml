@@ -4,6 +4,7 @@
    <soapenv:Body>
       <open:bookingInfoRequest>
          <open:agencyId>?</open:agencyId>
+         <!-- itemId (and serialPartId) or bookingId -->
          <open:itemId>?</open:itemId>
          <!--Optional:-->
          <open:serialPartId>?</open:serialPartId>
