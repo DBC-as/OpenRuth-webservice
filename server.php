@@ -46,9 +46,13 @@ class openRuth extends webServiceServer {
  *   holdings
  */
 
-  /** \brief 
+  /** \brief Fetch agencycounter for a given Agency
+   *
+   * @param $param - agencyId
+   * @return Agencycounter information according to the xsd
+   *
    */
-// more than one agencyCounter not supported yet
+
   function agencyCounters($param) { 
     if (!$this->aaa->has_right("openruth", 500))
       $res->agencyError->_value = "authentication_error";
@@ -105,7 +109,11 @@ class openRuth extends webServiceServer {
     return $ret;
   }
 
-  /** \brief 
+  /** \brief Fetch holdingsinfo 
+   *
+   * @param $param - agencyId and one or more itemIds
+   * @return holdings information according to the xsd
+   *
    */
   function holdings($param) { 
     if (!$this->aaa->has_right("openruth", 500))
@@ -235,35 +243,162 @@ class openRuth extends webServiceServer {
  *   cancelBooking 
  */
 
-  /** \brief 
+  /** \brief Fetch info for a booking
+   *
+   * @param $param - agency and either itemId (+serialId) or bookingId
+   * @return Information about the booking
+   *
    */
   function bookingInfo($param) { 
     if (!$this->aaa->has_right("openruth", 500))
       $res->bookingError->_value = "authentication_error";
     else {
-      $res->bookingError->_value = "not implemented yet";
+      $targets = $this->config->get_value("ruth", "ztargets");
+      $agencyId = $this->strip_agency($param->agencyId->_value);
+      if ($tgt = $targets[$agencyId]) {
+        $z = new z3950();
+        $z->set_target($tgt["host"]);
+        $z->set_database($tgt["database"]."-bookingprofile");
+        $z->set_authentication($tgt["authentication"]);
+        $z->set_syntax("xml");
+        $z->set_element("default");
+        $rpn = "@attrset 1.2.840.10003.3.1000.105.3 @and @attr 1=1 $agencyId ";
+        if ($param->bookingId->_value)
+          $rpn .= "@attr 1=7 \"" . $param->bookingId->_value . "\"";
+        elseif ($param->serialPartId->_value)
+          $rpn .= "@and @attr 1=2 " . $param->itemId->_value . " @attr 1=3 " . $param->serialPartId->_value;
+        else
+          $rpn .= "@and @attr 1=2 " . $param->itemId->_value . " @attr 1=3 0";
+        $z->set_rpn($rpn);
+        $this->watch->start("zsearch");
+        $hits = $z->z3950_search($tgt["timeout"]);
+        $this->watch->stop("zsearch");
+//echo "hits: " . $hits . "\n";
+//echo "err: " . $z->get_errno() . "\n";
+        if ($err = $z->get_errno()) {
+          $res->bookingError->_value = "cannot reach local system - (" . $err . ")";
+        } elseif (empty($hits))
+          $res->bookingError->_value = "No booking found";
+        else {
+          $this->watch->start("zrecord");
+          $booking = $z->z3950_record(1);
+          $this->watch->stop("zrecord");
+//echo "booking: /" . $booking . "/\n";
+          $dom = new DomDocument();
+          $dom->preserveWhiteSpace = false;
+          if ($dom->loadXML($booking)) {
+            $trans = array(
+              array("from" => "Total", "to" => "bookingInfoTotalCount"),
+              array("from" => "BookingNote", "to" => "bookingNote"));
+            foreach ($dom->getElementsByTagName("BookingProfile") as $bp)
+              $this->move_tags($bp, $res->bookingInfo->_value, $trans);
+            foreach ($dom->getElementsByTagName("BookingChange") as $bc) {
+              $rbc->bookingChangeCount->_value = $bc->nodeValue;
+              $rbc->bookingChangeDate->_value = $bc->getAttribute("D");
+              $res->bookingInfo->_value->bookingChange[]->_value = $rbc;
+              unset($rbc);
+            }
+          } else {
+            verbose::log(ERROR, "ES order (" . __LINE__ . ") loadXML error of: " . $xml_ret["xmlUpdateDoc"]);
+            $res->renewLoanError->_value = "undefined error";
+          }
+        }
+      } else
+        $res->bookingError->_value = "unknown agencyId";
     }
 
     $ret->bookingInfoResponse->_value = $res;
-    //var_dump($param); var_dump($res); die();
+    //var_dump($param); print_r($res); die();
     return $ret;
   }
 
-  /** \brief 
+  /** \brief - book an item
+   *
+   * @param $param - agencyId, userId, agencyCounter, bookingNote, bookingStartDate, bookingEndDate, bookingTotalCount, itemId, itemSerialPartId,
+   * @return 
+   *
    */
   function bookItem($param) { 
     if (!$this->aaa->has_right("openruth", 500))
       $res->bookingError->_value = "authentication_error";
     else {
-      $res->bookingError->_value = "not implemented yet";
+      $agencyId = $this->strip_agency($param->agencyId->_value);
+      $targets = $this->config->get_value("ruth", "ztargets");
+      if ($tgt = $targets[$agencyId]) {
+        $book = &$booking->Booking->_value;
+        $book->LibraryNo->_value = $agencyId;
+        $book->BorrowerTicketNo->_value = $param->userId->_value;
+        $book->BookingNote->_value = $param->bookingNote->_value;
+        $book->StartDate->_value = $this->to_zruth_date($param->bookingStartDate->_value);
+        $book->EndDate->_value = $this->to_zruth_date($param->bookingEndDate->_value);
+        $book->NumberOrdered->_value = $param->bookingTotalCount->_value;
+        $book->ServiceCounter->_value = $param->agencyCounter->_value;
+        $book->MRID->_value->ID->_value = $param->itemId->_value;
+        $book->MRID->_value->TitlePartNo->_value = ($param->itemSerialPartId->_value ? $param->itemSerialPartId->_value : 0);
+        $xml = '<?xml version="1.0" encoding="UTF-8"?'.'>' . $this->objconvert->obj2xml($booking);
+        $z = new z3950();
+        $z->set_target($tgt["host"]);
+        $z->set_database($tgt["database"]."-ophelia");
+        $z->set_authentication($tgt["authentication"]);
+        $xml_ret = $z->z3950_xml_update($xml, $tgt["timeout"]);
+//echo "error: " . $z->get_errno();
+//print_r($xml);
+//print_r($xml_ret);
+        if ($z->get_errno() == 0 && $xml_ret["xmlUpdateDoc"]) {
+          $dom = new DomDocument();
+          $dom->preserveWhiteSpace = false;
+          if ($dom->loadXML($xml_ret["xmlUpdateDoc"])) {
+            $errs = array("1101" => "no agencyId supplied", 
+                          "1102" => "unknown agencyId",
+                          "1123" => "no itemId, titlePartNo or bookingId supplied",
+                          "1110" => "overbooking",
+                          "1111" => "counter does not exist",
+                          "1112" => "bookingStartDate must be before bookingEndDate",
+                          "1113" => "bookingTotal Count must be 1 or more",
+                          "1114" => "normal period of booking exceeded",
+                          "1115" => "undefined error",
+                          "1116" => "number of fetched copies exceeds number of ordered copies");
+            if ($err = $dom->getElementsByTagName("Error")->item(0)->nodeValue) {
+              verbose::log(ERROR, "ES book (" . __LINE__ . ") errno: " . $err);
+              if (!($res->bookingError->_value = $errs[$err])) 
+                $res->bookingError->_value = "unspecified error (" . $err . "), order not possible";
+            } else {
+              $res->bookingOk->_value = $dom->getElementsByTagName("BookingID")->item(0)->nodeValue;
+            }
+          } else {
+            verbose::log(ERROR, "ES book (" . __LINE__ . ") loadXML error of: " . $xml_ret["xmlUpdateDoc"]);
+            $res->renewLoanError->_value = "system error";
+          }
+        } else {
+          verbose::log(ERROR, "ES book (" . __LINE__ . ") z-errno: " . $z->get_error_string());
+          $res->bookingError->_value = "system error";
+        }
+      } else
+        $res->bookingError->_value = "unknown agencyId";
     }
 
     $ret->bookItemResponse->_value = $res;
-    //var_dump($param); var_dump($res); die();
+    //var_dump($param); print_r($res); die();
     return $ret;
   }
 
   /** \brief 
+   *
+   * @param $param -
+   * @return 
+   *
+  $search = $TARGET["xml"];
+  $search["xml"] =
+'<BookingUpdate>
+  <LibraryNo>'.LIBRARY_CODE_FOR_BORBASE.'</LibraryNo>
+  <DisposalID>'.$DisposalID.'</DisposalID>
+  <BookingNote>'.$BookingNote.'</BookingNote>
+  <StartDate>'.$StartDate.'</StartDate>
+  <EndDate>'.$EndDate.'</EndDate>
+  <NumberOrdered>'.$NumberOrdered.'</NumberOrdered>
+  <ServiceCounter>'.$ServiceCounter.'</ServiceCounter>
+</BookingUpdate>';
+  Zxmlupdate($search);
    */
   function updateBooking($param) { 
     if (!$this->aaa->has_right("openruth", 500))
@@ -278,6 +413,19 @@ class openRuth extends webServiceServer {
   }
 
   /** \brief 
+   *
+   * @param $param -
+   * @return 
+   *
+    $search = $TARGET["xml"];
+    $search["xml"] = '
+    <BookingDelete>
+      <LibraryNo>'.LIBRARY_CODE_FOR_BORBASE.'</LibraryNo>
+      <DisposalID>'.$DisposalID.'</DisposalID>
+    </BookingDelete>';
+
+    Zxmlupdate($search);
+    $data = $search['xmlresult'];
    */
   function cancelBooking($param) { 
     if (!$this->aaa->has_right("openruth", 500))
@@ -301,6 +449,10 @@ class openRuth extends webServiceServer {
  */
 
   /** \brief 
+   *
+   * @param $param 
+   * @return 
+   *
    */
   function cancelOrder($param) { 
     if (!$this->aaa->has_right("openruth", 500))
@@ -315,6 +467,10 @@ class openRuth extends webServiceServer {
   }
 
   /** \brief 
+   *
+   * @param $param - 
+   * @return 
+   *
    */
   function orderItem($param) { 
     if (!$this->aaa->has_right("openruth", 500))
@@ -432,6 +588,10 @@ class openRuth extends webServiceServer {
 /*
 
   /** \brief 
+   *
+   * @param $param 
+   * @return
+   *
    */
   function updateOrder($param) { 
     if (!$this->aaa->has_right("openruth", 500))
@@ -458,6 +618,10 @@ class openRuth extends webServiceServer {
  */
 
   /** \brief 
+   *
+   * @param $param 
+   * @return
+   *
    */
   function renewLoan($param) { 
     if (!$this->aaa->has_right("openruth", 500))
@@ -496,10 +660,10 @@ class openRuth extends webServiceServer {
                           "1036" => "copy not on loan",
                           "1037" => "copy does not exist",
                           "1038" => "ILL, not renewable");
-            if ($err = $dom->getElementsByTagName("BorrowerError")->item(0)) {
-              verbose::log(ERROR, "ES order (" . __LINE__ . ") errno: " . $err->nodeValue);
-              if (!($res->renewLoanError->_value = $errs[$err->nodeValue])) 
-                $res->renewLoanError->_value = "unspecified error (" . $err->nodeValue . "), order not possible";
+            if ($err = $dom->getElementsByTagName("BorrowerError")->item(0)->nodeValue) {
+              verbose::log(ERROR, "ES order (" . __LINE__ . ") errno: " . $err);
+              if (!($res->renewLoanError->_value = $errs[$err])) 
+                $res->renewLoanError->_value = "unspecified error (" . $err . "), order not possible";
             } else {
               foreach ($dom->getElementsByTagName("CopyNoStatus") as $cns) {
                 $rl->copyId->_value = $cns->getAttribute("CopyNo");
@@ -529,6 +693,10 @@ class openRuth extends webServiceServer {
   }
 
   /** \brief 
+   *
+   * @param $param 
+   * @return
+   *
    */
   function updateUserInfo($param) { 
     if (!$this->aaa->has_right("openruth", 500))
@@ -543,6 +711,10 @@ class openRuth extends webServiceServer {
   }
 
   /** \brief 
+   *
+   * @param $param
+   * @return
+   *
    */
   function userCheck($param) { 
     if (!$this->aaa->has_right("openruth", 500))
@@ -608,6 +780,10 @@ class openRuth extends webServiceServer {
   }
 
   /** \brief 
+   *
+   * @param $param 
+   * @return 
+   *
    */
   function userPayment($param) { 
     if (!$this->aaa->has_right("openruth", 500))
@@ -622,6 +798,10 @@ class openRuth extends webServiceServer {
   }
 
   /** \brief 
+   *
+   * @param $param 
+   * @return Information about the user
+   *
    */
   function userStatus($param) { 
     if (!$this->aaa->has_right("openruth", 500))
@@ -776,9 +956,10 @@ class openRuth extends webServiceServer {
             $book = &$res->userStatus->_value->bookings->_value;
             $bookings = &$dom->getElementsByTagName("Bookings")->item(0);
             $trans = array(
-              array("from" => "BookingId", "to" => "bookingId"),
+              array("from" => "BookingID", "to" => "bookingId"),
               array("from" => "Title", "to" => "itemDisplayTitle"),
               array("from" => "NumberOrdered", "to" => "bookingTotalCount"),
+              array("from" => "NumberRetained", "to" => "bookingFetchedCount"),
               array("from" => "NumberLoaned", "to" => "bookingLoanedCount"),
               array("from" => "NumberReturned", "to" => "bookingReturnedCount"),
               array("from" => "StartingDate", "to" => "bookingStartDate", "date" => "swap"),
@@ -865,6 +1046,14 @@ class openRuth extends webServiceServer {
   }
 
 
+  /** \brief Move nodes and attributes from dom-object to object according to rules in $tags
+   *
+   * @param $from dom object
+   * @param $to result object
+   * @param $tags array of nodes to move
+   *
+   * @return - called as procedure
+   */
   private function move_tags(&$from, &$to, &$tags) {
     foreach ($tags as $tag) 
       foreach ($from->getElementsByTagName($tag["from"]) as $node) {
@@ -879,13 +1068,31 @@ class openRuth extends webServiceServer {
         elseif ($tag["obligatory"])
           $to->{$tag["to"]}[]->_value = $node_val;
         elseif ($node_val <> NULL)
-          if ($tag["date"] == "swap" && substr($node_val, 2, 1) == "-" && substr($node_val, 5, 1) == "-")
-            $to->{$tag["to"]}[]->_value = substr($node_val, 6) . "-" . 
-                                          substr($node_val, 3, 2) . "-" . 
-                                          substr($node_val, 0, 2);
+          if ($tag["date"] == "swap")
+            $to->{$tag["to"]}[]->_value = $this->from_zruth_date($node_val);
           else
             $to->{$tag["to"]}[]->_value = $node_val;
       }
+  }
+
+ /** \brief
+  *  return converts from YYYY-MM-DD to DD-MM-YYYY
+  */
+  private function to_zruth_date($date) {
+    if (strlen($date) == 10 && substr($date, 4, 1) == "-" && substr($date, 7, 1) == "-")
+      return substr($date, 8) . "-" .  substr($date, 5, 2) . "-" .  substr($date, 0, 4);
+    else
+      return $date;
+  }
+
+ /** \brief
+  *  return converts from DD-MM-YYYY to YYYY-MM-DD
+  */
+  private function from_zruth_date($date) {
+    if (strlen($date) == 10 && substr($date, 2, 1) == "-" && substr($date, 5, 1) == "-")
+      return substr($date, 6) . "-" .  substr($date, 3, 2) . "-" .  substr($date, 0, 2);
+    else
+      return $date;
   }
 
  /** \brief
