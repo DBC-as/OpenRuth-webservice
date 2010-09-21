@@ -1,7 +1,7 @@
 ; Inifile for openruth
 
 [setup]
-version = 0.2
+version = 0.3
 
 ; wsdl for service
 wsdl = openruth.wsdl
@@ -62,7 +62,7 @@ logfile = /tmp/openruth.log
 verbose = WARNING+ERROR+FATAL+STAT+TIMER+TRACE+DEBUG+Z3950+OCI
 
 ; format for automatic timer dump %s is the soap-action used
-dump_timer = openruth
+dump_timer = openruth(%s)
 
 [ztargets]
 ; Ruth target_info
