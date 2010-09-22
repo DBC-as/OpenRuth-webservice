@@ -3,6 +3,7 @@
    <soapenv:Header/>
    <soapenv:Body>
       <open:cancelBookingRequest>
+         <open:agencyId>?</open:agencyId>
          <open:bookingId>?</open:bookingId>
          <!--Optional:-->
          <open:callback>?</open:callback>

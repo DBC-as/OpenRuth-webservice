@@ -11,7 +11,7 @@ Actions and Parameters:
     <li>SerialPartId:</li> For serials, Serial Id, otherwise empty
     <li>bookingId:</li> Id of booking 
   </ul>
-  <li>bookingItem</li>
+  <li>bookItem</li>
   <ul>
     <li>agencyId:</li> Id of the agency, like 123456 or DK-123456
     <li>userId:</li> Id of the user
@@ -22,6 +22,11 @@ Actions and Parameters:
     <li>bookingTotalCount:</li> Total number of copies of a booking
     <li>itemId:</li> Id of item
     <li>SerialPartId:</li> For serials, Serial Id, otherwise empty
+  </ul>
+  <li>cancelBooking</li>
+  <ul>
+    <li>agencyId:</li> Id of the agency, like 123456 or DK-123456
+    <li>bookingId:</li> Id of the booking
   </ul>
   <li>holdings</li>
   <ul>
@@ -40,6 +45,16 @@ Actions and Parameters:
     <li>orderEachItem:</li> true or false or empty
     <li>itemId:</li> Id of item to order, repeatable
     <li>itemSerialPartId:</li> For serials, Serial Id, otherwise empty, repeatable
+  </ul>
+  <li>updateBooking</li>
+  <ul>
+    <li>agencyId:</li> Id of the agency, like 123456 or DK-123456
+    <li>bookingId:</li> Id of the booking
+    <li>agencyCounter:</li> Pickup counter
+    <li>bookingNote:</li> Note for the booking
+    <li>bookingStartDate:</li> First active day of a booking
+    <li>bookingEndDate:</li> Date when a booking expires
+    <li>bookingsCount:</li> Total number of copies of a booking
   </ul>
   <li>userCheck</li>
   <ul>
