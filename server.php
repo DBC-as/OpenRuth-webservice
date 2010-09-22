@@ -26,15 +26,49 @@ require_once "OLS_class_lib/z3950_class.php";
 
 class openRuth extends webServiceServer {
 
-//  protected $curl;
+  protected $errs;
 
   public function __construct(){
     webServiceServer::__construct('openruth.ini');
-
-//    if (!$timeout = $this->config->get_value("curl_timeout", "setup"))
-//      $timeout = 20;
-//    $this->curl = new curl();
-//    $this->curl->set_option(CURLOPT_TIMEOUT, $timeout);
+    $this->errs = array("1" => "unknown userId", 
+                        "3" => "amount is not the full amount", 
+                        "1001" => "already on loan by user", 
+                        "1002" => "already reserved by user", 
+                        "1003" => "no copies available for reservation", 
+                        "1004" => "ordering not allowed for this user", 
+                        "1005" => "loan not allowed for this user category", 
+                        "1006" => "loan not allowed, user too young", 
+                        "1007" => "unspecified error, order not possible", 
+                        "1008" => "system error", 
+                        "1010" => "system error", 
+                        "1030" => "rejected", 
+                        "1020" => "booking, not cancelled", 
+                        "1030" => "rejected", 
+                        "1031" => "reserved",
+                        "1032" => "booked",
+                        "1033" => "copy reserved",
+                        "1034" => "user is blocked",
+                        "1035" => "copy not on loan by user",
+                        "1036" => "copy not on loan",
+                        "1037" => "copy does not exist",
+                        "1038" => "ILL, not renewable",
+                        "1050" => "ILL, not found",
+                        "1051" => "system error",
+                        "1052" => "ILL, not cancelled",
+                        "1101" => "no agencyId supplied", 
+                        "1102" => "unknown agencyId",
+                        "1103" => "unknown userId",
+                        "1104" => "wrong pin code",
+                        "1123" => "no itemId, titlePartNo or bookingId supplied",
+                        "1110" => "overbooking",
+                        "1111" => "counter does not exist",
+                        "1112" => "bookingStartDate must be before bookingEndDate",
+                        "1113" => "bookingTotal Count must be 1 or more",
+                        "1114" => "normal period of booking exceeded",
+                        "1115" => "undefined error",
+                        "1116" => "number of fetched copies exceeds number of ordered copies",
+                        "1120" => "undefined error",
+                        "1135" => "undefined error");
   }
 
 
@@ -216,7 +250,7 @@ class openRuth extends webServiceServer {
                   }
                 }
                 $res->holding[] = $res_hold;
-                //print_r($res_hold);
+//print_r($res_hold);
                 unset($res_hold);
               }
             } else
@@ -299,8 +333,8 @@ class openRuth extends webServiceServer {
               unset($rbc);
             }
           } else {
-            verbose::log(ERROR, "ES order (" . __LINE__ . ") loadXML error of: " . $xml_ret["xmlUpdateDoc"]);
-            $res->renewLoanError->_value = "undefined error";
+            verbose::log(ERROR, "order (" . __LINE__ . ") loadXML error of: " . $xml_ret["xmlUpdateDoc"]);
+            $res->bookingError->_value = "undefined error";
           }
         }
       } else
@@ -335,7 +369,7 @@ class openRuth extends webServiceServer {
         $book->ServiceCounter->_value = $param->agencyCounter->_value;
         $book->MRID->_value->ID->_value = $param->itemId->_value;
         $book->MRID->_value->TitlePartNo->_value = ($param->itemSerialPartId->_value ? $param->itemSerialPartId->_value : 0);
-        $xml = '<?xml version="1.0" encoding="UTF-8"?'.'>' . $this->objconvert->obj2xml($booking);
+        $xml = '<?xml version="1.0" encoding="UTF-8" ?'.'>' . $this->objconvert->obj2xml($booking);
         $z = new z3950();
         $z->set_target($tgt["host"]);
         $z->set_database($tgt["database"]."-ophelia");
@@ -348,29 +382,19 @@ class openRuth extends webServiceServer {
           $dom = new DomDocument();
           $dom->preserveWhiteSpace = false;
           if ($dom->loadXML($xml_ret["xmlUpdateDoc"])) {
-            $errs = array("1101" => "no agencyId supplied", 
-                          "1102" => "unknown agencyId",
-                          "1123" => "no itemId, titlePartNo or bookingId supplied",
-                          "1110" => "overbooking",
-                          "1111" => "counter does not exist",
-                          "1112" => "bookingStartDate must be before bookingEndDate",
-                          "1113" => "bookingTotal Count must be 1 or more",
-                          "1114" => "normal period of booking exceeded",
-                          "1115" => "undefined error",
-                          "1116" => "number of fetched copies exceeds number of ordered copies");
             if ($err = $dom->getElementsByTagName("Error")->item(0)->nodeValue) {
-              verbose::log(ERROR, "ES book (" . __LINE__ . ") errno: " . $err);
-              if (!($res->bookingError->_value = $errs[$err])) 
+              verbose::log(ERROR, "book (" . __LINE__ . ") errno: " . $err);
+              if (!($res->bookingError->_value = $this->errs[$err])) 
                 $res->bookingError->_value = "unspecified error (" . $err . "), order not possible";
             } else {
               $res->bookingOk->_value = $dom->getElementsByTagName("BookingID")->item(0)->nodeValue;
             }
           } else {
-            verbose::log(ERROR, "ES book (" . __LINE__ . ") loadXML error of: " . $xml_ret["xmlUpdateDoc"]);
-            $res->renewLoanError->_value = "system error";
+            verbose::log(ERROR, "book (" . __LINE__ . ") loadXML error of: " . $xml_ret["xmlUpdateDoc"]);
+            $res->bookingError->_value = "system error";
           }
         } else {
-          verbose::log(ERROR, "ES book (" . __LINE__ . ") z-errno: " . $z->get_error_string());
+          verbose::log(ERROR, "book (" . __LINE__ . ") z-errno: " . $z->get_error_string());
           $res->bookingError->_value = "system error";
         }
       } else
@@ -382,60 +406,114 @@ class openRuth extends webServiceServer {
     return $ret;
   }
 
-  /** \brief 
+  /** \brief Update an existing booking
    *
-   * @param $param -
+   * @param $param - agencyId, bookingId, agencyCounter, bookingNote, bookingStartDate, bookingEndDate, bookingsCount
    * @return 
    *
-  $search = $TARGET["xml"];
-  $search["xml"] =
-'<BookingUpdate>
-  <LibraryNo>'.LIBRARY_CODE_FOR_BORBASE.'</LibraryNo>
-  <DisposalID>'.$DisposalID.'</DisposalID>
-  <BookingNote>'.$BookingNote.'</BookingNote>
-  <StartDate>'.$StartDate.'</StartDate>
-  <EndDate>'.$EndDate.'</EndDate>
-  <NumberOrdered>'.$NumberOrdered.'</NumberOrdered>
-  <ServiceCounter>'.$ServiceCounter.'</ServiceCounter>
-</BookingUpdate>';
-  Zxmlupdate($search);
    */
   function updateBooking($param) { 
     if (!$this->aaa->has_right("openruth", 500))
       $res->bookingError->_value = "authentication_error";
     else {
-      $res->bookingError->_value = "not implemented yet";
+      $agencyId = $this->strip_agency($param->agencyId->_value);
+      $targets = $this->config->get_value("ruth", "ztargets");
+      if ($tgt = $targets[$agencyId]) {
+        $book = &$booking->BookingUpdate->_value;
+        $book->LibraryNo->_value = $agencyId;
+        $book->DisposalID->_value = $param->bookingId->_value;
+        $book->BookingNote->_value = $param->bookingNote->_value;
+        $book->StartDate->_value = $this->to_zruth_date($param->bookingStartDate->_value);
+        $book->EndDate->_value = $this->to_zruth_date($param->bookingEndDate->_value);
+        $book->NumberOrdered->_value = $param->bookingsCount->_value;
+        $book->ServiceCounter->_value = $param->agencyCounter->_value;
+        $xml = '<?xml version="1.0" encoding="UTF-8" ?'.'>' . $this->objconvert->obj2xml($booking);
+        $z = new z3950();
+        $z->set_target($tgt["host"]);
+        $z->set_database($tgt["database"]."-ophelia");
+        $z->set_authentication($tgt["authentication"]);
+        $xml_ret = $z->z3950_xml_update($xml, $tgt["timeout"]);
+//echo "error: " . $z->get_errno();
+//print_r($xml);
+//print_r($xml_ret);
+        if ($z->get_errno() == 0 && $xml_ret["xmlUpdateDoc"]) {
+          $dom = new DomDocument();
+          $dom->preserveWhiteSpace = false;
+          if ($dom->loadXML($xml_ret["xmlUpdateDoc"])) {
+            if ($err = $dom->getElementsByTagName("Error")->item(0)->nodeValue) {
+              verbose::log(ERROR, "updateBook (" . __LINE__ . ") errno: " . $err);
+              if (!($res->bookingError->_value = $this->errs[$err])) 
+                $res->bookingError->_value = "unspecified error (" . $err . "), order not possible";
+            } else {
+              $res->bookingOk->_value = $param->bookingId->_value;
+            }
+          } else {
+            verbose::log(ERROR, "updateBook (" . __LINE__ . ") loadXML error of: " . $xml_ret["xmlUpdateDoc"]);
+            $res->bookingError->_value = "system error";
+          }
+        } else {
+          verbose::log(ERROR, "updateBook (" . __LINE__ . ") z-errno: " . $z->get_error_string());
+          $res->bookingError->_value = "system error";
+        }
+      } else
+        $res->bookingError->_value = "unknown agencyId";
     }
 
     $ret->updateBookingResponse->_value = $res;
-    //var_dump($param); var_dump($res); die();
+    //var_dump($param); print_r($res); die();
     return $ret;
   }
 
-  /** \brief 
+  /** \brief Delete a booking
    *
-   * @param $param -
+   * @param $param - agencyId, bookingId
    * @return 
    *
-    $search = $TARGET["xml"];
-    $search["xml"] = '
-    <BookingDelete>
-      <LibraryNo>'.LIBRARY_CODE_FOR_BORBASE.'</LibraryNo>
-      <DisposalID>'.$DisposalID.'</DisposalID>
-    </BookingDelete>';
-
-    Zxmlupdate($search);
-    $data = $search['xmlresult'];
    */
   function cancelBooking($param) { 
     if (!$this->aaa->has_right("openruth", 500))
       $res->bookingError->_value = "authentication_error";
     else {
-      $res->bookingError->_value = "not implemented yet";
+      $agencyId = $this->strip_agency($param->agencyId->_value);
+      $targets = $this->config->get_value("ruth", "ztargets");
+      if ($tgt = $targets[$agencyId]) {
+        $book = &$booking->BookingDelete->_value;
+        $book->LibraryNo->_value = $agencyId;
+        $book->DisposalID->_value = $param->bookingId->_value;
+        $xml = '<?xml version="1.0" encoding="UTF-8" ?'.'>' . $this->objconvert->obj2xml($booking);
+        $z = new z3950();
+        $z->set_target($tgt["host"]);
+        $z->set_database($tgt["database"]."-ophelia");
+        $z->set_authentication($tgt["authentication"]);
+        $xml_ret = $z->z3950_xml_update($xml, $tgt["timeout"]);
+//echo "error: " . $z->get_errno();
+//print_r($xml);
+//print_r($xml_ret);
+        if ($z->get_errno() == 0 && $xml_ret["xmlUpdateDoc"]) {
+          $dom = new DomDocument();
+          $dom->preserveWhiteSpace = false;
+          if ($dom->loadXML($xml_ret["xmlUpdateDoc"])) {
+            if ($err = $dom->getElementsByTagName("ErrorResponse")->item(0)) {
+              verbose::log(ERROR, "cancelBook (" . __LINE__ . ") errno: " . $err->getAttribute("Err"));
+              if (!($res->bookingError->_value = $this->errs[$err->getAttribute("Err")])) 
+                $res->bookingError->_value = "unspecified error (" . $err->getAttribute("Err") . "), order not possible";
+            } else {
+              $res->bookingOk->_value = $param->bookingId->_value;
+            }
+          } else {
+            verbose::log(ERROR, "cancelBook (" . __LINE__ . ") loadXML error of: " . $xml_ret["xmlUpdateDoc"]);
+            $res->bookingError->_value = "system error";
+          }
+        } else {
+          verbose::log(ERROR, "cancelBook (" . __LINE__ . ") z-errno: " . $z->get_error_string());
+          $res->bookingError->_value = "system error";
+        }
+      } else
+        $res->bookingError->_value = "unknown agencyId";
     }
 
     $ret->cancelBookingResponse->_value = $res;
-    var_dump($param); var_dump($res); die();
+    //var_dump($param); print_r($res); die();
     return $ret;
   }
 
@@ -448,9 +526,9 @@ class openRuth extends webServiceServer {
  *   updateOrder (UpdateOrders) 
  */
 
-  /** \brief 
+  /** \brief Delete a reservation
    *
-   * @param $param 
+   * @param $param - agencyId, orderId
    * @return 
    *
    */
@@ -458,17 +536,53 @@ class openRuth extends webServiceServer {
     if (!$this->aaa->has_right("openruth", 500))
       $res->cancelOrderError->_value = "authentication_error";
     else {
-      $res->cancelOrderError->_value = "not implemented yet";
+      $agencyId = $this->strip_agency($param->agencyId->_value);
+      $targets = $this->config->get_value("ruth", "ztargets");
+      if ($tgt = $targets[$agencyId]) {
+        $ord = &$order->ReservationDelete->_value;
+        $ord->LibraryNo->_value = $agencyId;
+        $ord->DisposalID->_value = $param->orderId->_value;
+        $xml = '<?xml version="1.0" encoding="UTF-8" ?'.'>' . $this->objconvert->obj2xml($order);
+        $z = new z3950();
+        $z->set_target($tgt["host"]);
+        $z->set_database($tgt["database"]."-ophelia");
+        $z->set_authentication($tgt["authentication"]);
+        $xml_ret = $z->z3950_xml_update($xml, $tgt["timeout"]);
+//echo "error: " . $z->get_errno();
+//print_r($xml);
+//print_r($xml_ret);
+        if ($z->get_errno() == 0 && $xml_ret["xmlUpdateDoc"]) {
+          $dom = new DomDocument();
+          $dom->preserveWhiteSpace = false;
+          if ($dom->loadXML($xml_ret["xmlUpdateDoc"])) {
+            if ($err = $dom->getElementsByTagName("ReservationDeleteResponse")->item(0)->nodeValue) {
+              verbose::log(ERROR, "cancelOrder (" . __LINE__ . ") errno: " . $err);
+              if (!($res->cancelOrderError->_value = $this->errs[$err])) 
+                $res->cancelOrderError->_value = "unspecified error (" . $err . "), order not possible";
+            } else {
+              $res->cancelOrderOk->_value = $param->orderId->_value;
+            }
+          } else {
+            verbose::log(ERROR, "cancelOrder (" . __LINE__ . ") loadXML error of: " . $xml_ret["xmlUpdateDoc"]);
+            $res->cancelOrderError->_value = "system error";
+          }
+        } else {
+          verbose::log(ERROR, "cancelOrder (" . __LINE__ . ") z-errno: " . $z->get_error_string());
+          $res->cancelOrderError->_value = "system error";
+        }
+      } else
+        $res->cancelOrderError->_value = "unknown agencyId";
     }
 
     $ret->cancelOrderResponse->_value = $res;
-    var_dump($param); var_dump($res); die();
+    //var_dump($param); print_r($res); die();
     return $ret;
   }
 
-  /** \brief 
+  /** \brief Create a new reservation
    *
-   * @param $param - 
+   * @param $param - agencyId, userId, orderNote, orderLastInterestDate, agencyCounter, 
+   *                 orderOverRule, orderPriority, orderEachItem, itemId, itemSerialPartId,
    * @return 
    *
    */
@@ -484,10 +598,7 @@ class openRuth extends webServiceServer {
         $ord->LibraryNo->_value = $agencyId;
         $ord->BorrowerTicketNo->_value = $param->userId->_value;
         $ord->DisposalNote->_value = $param->orderNote->_value;
-        $ord->LastUseDate->_value = sprintf("%02d-%02d-%04d", 
-                                            substr($param->orderLastInterestDate->_value, 8, 2), 
-                                            substr($param->orderLastInterestDate->_value, 5, 2), 
-                                            substr($param->orderLastInterestDate->_value, 0, 4));
+        $ord->LastUseDate->_value = $this->to_zruth_date($param->orderLastInterestDate->_value);
         $ord->ServiceCounter->_value = $param->agencyCounter->_value;
         $ord->Override->_value = ($this->xs_true($param->agencyCounter->_value) ? "Y" : "N");
         $ord->Priority->_value = $param->orderPriority->_value;
@@ -506,7 +617,7 @@ class openRuth extends webServiceServer {
             $mrid->TitlePartNo->_value = 0;
           $ord->MRIDS->_value->MRID->_value = $mrid;
         }
-        $xml = '<?xml version="1.0" encoding="UTF-8"?'.'>' . $this->objconvert->obj2xml($order);
+        $xml = '<?xml version="1.0" encoding="UTF-8" ?'.'>' . $this->objconvert->obj2xml($order);
         
 //print_r($ord);
 //print_r($xml);
@@ -521,7 +632,7 @@ class openRuth extends webServiceServer {
           $dom->preserveWhiteSpace = false;
           if ($dom->loadXML($xml_ret["xmlUpdateDoc"])) {
             if ($err = &$dom->getElementsByTagName("ErrorResponse")->item(0)) {
-              verbose::log(ERROR, "ES order (" . __LINE__ . ") errno: " . $err->getAttribute("Err") . 
+              verbose::log(ERROR, "order (" . __LINE__ . ") errno: " . $err->getAttribute("Err") . 
                                   " error: " . $err->nodeValue);
               $res->orderItemError->_value = "unspecified error, order not possible";
             } else {
@@ -530,26 +641,16 @@ class openRuth extends webServiceServer {
                 unset($ir);
                 $ir->orderItemId->_value = $mrid->getAttribute("Id");
                 //$ir->orderItemTitlePart->_value = $mrid->getAttribute("Tp");
-                if ($mrid->nodeValue)
-                  switch ($mrid->nodeValue) {
-                    case "1001" : $ir->orderItemError->_value = "already on loan by user"; break;
-                    case "1002" : $ir->orderItemError->_value = "already reserved by user"; break;
-                    case "1003" : $ir->orderItemError->_value = "no copies available for reservation"; break;
-                    case "1004" : $ir->orderItemError->_value = "ordering not allowed for this user"; break;
-                    case "1005" : $ir->orderItemError->_value = "loan not allowed for this user category"; break;
-                    case "1006" : $ir->orderItemError->_value = "loan not allowed, user too young"; break;
-                    case "1007" : $ir->orderItemError->_value = "unspecified error, order not possible"; break;
-                    case "1008" : $ir->orderItemError->_value = "system error"; break;
-                    default     : $ir->orderItemError->_value = "unknown error: " . $mrid->nodeValue; break;
-                  }
-                else
+                if (!$mrid->nodeValue)
                   $ir->orderItemOk->_value = "true";
+                elseif (!($ir->orderItemError->_value = $this->errs[$mrid->nodeValue])) 
+                  $ir->orderItemError->_value = "unknown error: " . $mrid->nodeValue;
                 $res->orderItem[]->_value = $ir;
               }
             }
           }
         } else {
-          verbose::log(ERROR, "ES order (" . __LINE__ . ") z-errno: " . $z->get_error_string());
+          verbose::log(ERROR, "order (" . __LINE__ . ") z-errno: " . $z->get_error_string());
           $res->orderItemError->_value = "system error";
         }
 //echo "\n";
@@ -563,33 +664,10 @@ class openRuth extends webServiceServer {
     //var_dump($param); var_dump($res); die();
     return $ret;
   }
-/*Array
-(
-    [host] => z3950.q1fjern.integrabib.dk
-    [database] => q1fjern-ophelia
-    [authentication] => ophelia/q1fjern/uka1Rivo
-    [format] => k
-    [formats] => Array
-        (
-            [k] => xml/f2o6locations
-            [l] => xml/f2o6locations
-            [v] => xml/f2bindo6
-            [ll] => xml/f2o6locations
-            [rss] => xml/rss
-        )
-    [start] => 1
-    [step] => 10
-    [timeout] => 30
-    [xml] => 
-<Reservation><LibraryNo>100450</LibraryNo><BorrowerTicketNo>222</BorrowerTicketNo><DisposalNote></DisposalNote><LastUseDate>23-09-2010</LastUseDate><ServiceCounter>DBCMedier</ServiceCounter><Override>N</Override><Priority>3</Priority><DisposalType>N</DisposalType><MRIDS><MRID><ID>24624471</ID><TitlePartNo>0</TitlePartNo></MRID></MRIDS></Reservation>
 
-<Reservation><LibraryNo>100450</LibraryNo><BorrowerTicketNo>0019</BorrowerTicketNo><DisposalNote>This is an order note</DisposalNote><LastUseDate>25-01-2011</LastUseDate><ServiceCounter>DBCMedier</ServiceCounter><Override>N</Override><Priority>0</Priority><MRIDS><MRID><ID>1122334455</ID><TitlePartNo>0</TitlePartNo></MRID></MRIDS></Reservation>
-    [xmlresult] => <ReservationResponse><BorrowerError>0</BorrowerError><MRID Id="24624471" Tp="0">1007</MRID></ReservationResponse>
-/*
-
-  /** \brief 
+  /** \brief Update an existing reservation
    *
-   * @param $param 
+   * @param $param - agencyId, orderId, orderNote, orderLastInterestDate, agencyCounter
    * @return
    *
    */
@@ -597,11 +675,49 @@ class openRuth extends webServiceServer {
     if (!$this->aaa->has_right("openruth", 500))
       $res->updateOrderError->_value = "authentication_error";
     else {
-      $res->updateOrderError->_value = "not implemented yet";
+      $agencyId = $this->strip_agency($param->agencyId->_value);
+      $targets = $this->config->get_value("ruth", "ztargets");
+      if ($tgt = $targets[$agencyId]) {
+        $ord = &$order->ReservationUpdate->_value;
+        $ord->LibraryNo->_value = $agencyId;
+        $ord->DisposalID->_value = $param->orderId->_value;
+        $ord->DisposalNote->_value = $param->orderNote->_value;
+        $ord->LastUseDate->_value = $this->to_zruth_date($param->orderLastInterestDate->_value);
+        $ord->ServiceCounter->_value = $param->agencyCounter->_value;
+        $xml = '<?xml version="1.0" encoding="UTF-8" ?'.'>' . $this->objconvert->obj2xml($order);
+        $z = new z3950();
+        $z->set_target($tgt["host"]);
+        $z->set_database($tgt["database"]."-ophelia");
+        $z->set_authentication($tgt["authentication"]);
+        $xml_ret = $z->z3950_xml_update($xml, $tgt["timeout"]);
+//echo "error: " . $z->get_errno();
+//print_r($xml);
+//print_r($xml_ret);
+        if ($z->get_errno() == 0 && $xml_ret["xmlUpdateDoc"]) {
+          $dom = new DomDocument();
+          $dom->preserveWhiteSpace = false;
+          if ($dom->loadXML($xml_ret["xmlUpdateDoc"])) {
+            if ($err = $dom->getElementsByTagName("ErrorResponse")->item(0)) {
+              verbose::log(ERROR, "updateOrder (" . __LINE__ . ") errno: " . $err->getAttribute("Err"));
+              if (!($res->updateOrderError->_value = $this->errs[$err->getAttribute("Err")])) 
+                $res->updateOrderError->_value = "unspecified error (" . $err->getAttribute("Err") . "), order not possible";
+            } else {
+              $res->updateOrderOk->_value = $param->orderId->_value;
+            }
+          } else {
+            verbose::log(ERROR, "updateOrder (" . __LINE__ . ") loadXML error of: " . $xml_ret["xmlUpdateDoc"]);
+            $res->updateOrderError->_value = "system error";
+          }
+        } else {
+          verbose::log(ERROR, "updateOrder (" . __LINE__ . ") z-errno: " . $z->get_error_string());
+          $res->updateOrderError->_value = "system error";
+        }
+      } else
+        $res->updateOrderError->_value = "unknown agencyId";
     }
 
     $ret->updateOrderResponse->_value = $res;
-    //var_dump($param); var_dump($res); die();
+    //var_dump($param); print_r($res); die();
     return $ret;
   }
 
@@ -617,7 +733,7 @@ class openRuth extends webServiceServer {
  *   userStatus (BorrowerStatus) 
  */
 
-  /** \brief 
+  /** \brief Renew a loan
    *
    * @param $param 
    * @return
@@ -638,7 +754,7 @@ class openRuth extends webServiceServer {
             $renewal->CopyNos->_value->CopyNo[]->_value = $copyId->_value;
         else
           $renewal->CopyNos->_value->CopyNo->_value = $param->copyId->_value;
-        $xml = '<?xml version="1.0" encoding="UTF-8"?'.'>' . $this->objconvert->obj2xml($renew);
+        $xml = '<?xml version="1.0" encoding="UTF-8" ?'.'>' . $this->objconvert->obj2xml($renew);
         $z = new z3950();
         $z->set_target($tgt["host"]);
         $z->set_database($tgt["database"]."-ophelia");
@@ -651,36 +767,27 @@ class openRuth extends webServiceServer {
           $dom = new DomDocument();
           $dom->preserveWhiteSpace = false;
           if ($dom->loadXML($xml_ret["xmlUpdateDoc"])) {
-            $errs = array("1030" => "rejected", 
-                          "1031" => "reserved",
-                          "1032" => "booked",
-                          "1033" => "copy reserved",
-                          "1034" => "user is blocked",
-                          "1035" => "copy not on loan by user",
-                          "1036" => "copy not on loan",
-                          "1037" => "copy does not exist",
-                          "1038" => "ILL, not renewable");
             if ($err = $dom->getElementsByTagName("BorrowerError")->item(0)->nodeValue) {
-              verbose::log(ERROR, "ES order (" . __LINE__ . ") errno: " . $err);
-              if (!($res->renewLoanError->_value = $errs[$err])) 
+              verbose::log(ERROR, "renew (" . __LINE__ . ") errno: " . $err);
+              if (!($res->renewLoanError->_value = $this->errs[$err])) 
                 $res->renewLoanError->_value = "unspecified error (" . $err . "), order not possible";
             } else {
               foreach ($dom->getElementsByTagName("CopyNoStatus") as $cns) {
                 $rl->copyId->_value = $cns->getAttribute("CopyNo");
                 if (!$cns->nodeValue)
                   $rl->renewLoanOk->_value = "true";
-                elseif (!($rl->renewLoanError->_value = $errs[$cns->nodeValue])) 
+                elseif (!($rl->renewLoanError->_value = $this->errs[$cns->nodeValue])) 
                   $rl->renewLoanError->_value = "unspecified error (" . $cns->nodeValue . "), order not possible";
                 $res->renewLoan[]->_value = $rl;
                 unset($rl);
               }
             }
           } else {
-            verbose::log(ERROR, "ES order (" . __LINE__ . ") loadXML error of: " . $xml_ret["xmlUpdateDoc"]);
+            verbose::log(ERROR, "renew (" . __LINE__ . ") loadXML error of: " . $xml_ret["xmlUpdateDoc"]);
             $res->renewLoanError->_value = "system error";
           }
         } else {
-          verbose::log(ERROR, "ES order (" . __LINE__ . ") z-errno: " . $z->get_error_string());
+          verbose::log(ERROR, "renew (" . __LINE__ . ") z-errno: " . $z->get_error_string());
           $res->renewLoanError->_value = "system error";
         }
       } else
@@ -694,7 +801,8 @@ class openRuth extends webServiceServer {
 
   /** \brief 
    *
-   * @param $param 
+   * @param $param agencyId, userId, userPinCodeOld, userPinCodeNew, userEmail, userMobilePhone, 
+   *               userPreReturnMessage, userFirstName, userLastName, agencyCounter
    * @return
    *
    */
@@ -702,18 +810,65 @@ class openRuth extends webServiceServer {
     if (!$this->aaa->has_right("openruth", 500))
       $res->userError->_value = "authentication_error";
     else {
-      $res->userError->_value = "not implemented yet";
+      $agencyId = $this->strip_agency($param->agencyId->_value);
+      $targets = $this->config->get_value("ruth", "ztargets");
+      if ($tgt = $targets[$agencyId]) {
+        $bor = &$borrower->BorrowerPinMail->_value;
+        $bor->LibraryNo->_value = $agencyId;
+        $bor->BorrowerTicketNo->_value = $param->userId->_value;
+        $bor->OldPinCode->_value = $param->userPinCodeOld->_value;
+        if ($param->userPinCodeNew->_value) $bor->NewPinCode->_value = $param->userPinCodeNew->_value;
+        if ($param->userEmail->_value) $bor->Email->_value = $param->userEmail->_value;
+        if ($param->userMobilePhone->_value) $bor->MobilePhone->_value = $param->userMobilePhone->_value;
+        if ($param->userPreReturnMessage->_value) $bor->UsePreReturnMsg->_value = $param->userPreReturnMessage->_value;
+        if ($param->userFirstName->_value) $bor->FirstName->_value = $param->userFirstName->_value;
+        if ($param->userLastName->_value) $bor->FamilyName->_value = $param->userLastName->_value;
+        if ($param->agencyCounter->_value) $bor->StandardCounter->_value = $param->agencyCounter->_value;
+        $xml = '<?xml version="1.0" encoding="UTF-8" ?'.'>' . $this->objconvert->obj2xml($borrower);
+        $z = new z3950();
+        $z->set_target($tgt["host"]);
+        $z->set_database($tgt["database"]."-ophelia");
+        $z->set_authentication($tgt["authentication"]);
+        $xml_ret = $z->z3950_xml_update($xml, $tgt["timeout"]);
+//echo "error: " . $z->get_errno();
+//print_r($xml);
+//print_r($xml_ret);
+        if ($z->get_errno() == 0 && $xml_ret["xmlUpdateDoc"]) {
+          $dom = new DomDocument();
+          $dom->preserveWhiteSpace = false;
+          if ($dom->loadXML($xml_ret["xmlUpdateDoc"])) {
+            if ($err = $dom->getElementsByTagName("ErrorResponse")->item(0)) {
+              verbose::log(ERROR, "updateUser (" . __LINE__ . ") errno: " . $err->getAttribute("Err"));
+              if (!($res->userError->_value = $this->errs[$err->getAttribute("Err")])) 
+                $res->userError->_value = "unspecified error (" . $err->getAttribute("Err") . "), user not updated";
+            } elseif ($err = $dom->getElementsByTagName("BorrowerPinMailResponse")->item(0)->nodeValue) {
+              verbose::log(ERROR, "updateUser (" . __LINE__ . ") errno: " . $err);
+              if (!($res->userError->_value = $this->errs[$err])) 
+                $res->userError->_value = "unspecified error (" . $err . "), user not updated";
+            } else {
+              $res->updateUserInfoOk->_value = "true";
+            }
+          } else {
+            verbose::log(ERROR, "updateUser (" . __LINE__ . ") loadXML error of: " . $xml_ret["xmlUpdateDoc"]);
+            $res->userError->_value = "cannot decode answer";
+          }
+        } else {
+          verbose::log(ERROR, "updateUser (" . __LINE__ . ") z-errno: " . $z->get_error_string());
+          $res->userError->_value = "cannot reach local system";
+        }
+      } else
+        $res->userError->_value = "unknown agencyId";
     }
 
     $ret->updateUserInfoResponse->_value = $res;
-    //var_dump($param); var_dump($res); die();
+    //var_dump($param); print_r($res); die();
     return $ret;
   }
 
-  /** \brief 
+  /** \brief Check if user exist
    *
-   * @param $param
-   * @return
+   * @param $param - agencyId, userId, userPinCode
+   * @return info about user
    *
    */
   function userCheck($param) { 
@@ -781,7 +936,7 @@ class openRuth extends webServiceServer {
 
   /** \brief 
    *
-   * @param $param 
+   * @param $param - agencyId, userId, fineAmountPaid
    * @return 
    *
    */
@@ -789,11 +944,48 @@ class openRuth extends webServiceServer {
     if (!$this->aaa->has_right("openruth", 500))
       $res->userPaymentError->_value = "authentication_error";
     else {
-      $res->userPaymentError->_value = "not implemented yet";
+      $agencyId = $this->strip_agency($param->agencyId->_value);
+      $targets = $this->config->get_value("ruth", "ztargets");
+      if ($tgt = $targets[$agencyId]) {
+        $pay = &$payment->BorrowerPay->_value;
+        $pay->LibraryNo->_value = $agencyId;
+        $pay->BorrowerTicketNo->_value = $param->userId->_value;
+        $pay->Amount->_value = $param->fineAmountPaid->_value;
+        ///$pay->TransactionID->_value = $param->???->_value;
+        $xml = '<?xml version="1.0" encoding="UTF-8" ?'.'>' . $this->objconvert->obj2xml($payment);
+        $z = new z3950();
+        $z->set_target($tgt["host"]);
+        $z->set_database($tgt["database"]."-ophelia");
+        $z->set_authentication($tgt["authentication"]);
+        $xml_ret = $z->z3950_xml_update($xml, $tgt["timeout"]);
+//echo "error: " . $z->get_errno();
+//print_r($xml);
+//print_r($xml_ret);
+        if ($z->get_errno() == 0 && $xml_ret["xmlUpdateDoc"]) {
+          $dom = new DomDocument();
+          $dom->preserveWhiteSpace = false;
+          if ($dom->loadXML('<?xml version="1.0" encoding="ISO-8859-1" ?'.'>'.$xml_ret["xmlUpdateDoc"])) {
+            if ($err = $dom->getElementsByTagName("ErrorResponse")->item(0)) {
+              verbose::log(ERROR, "userPayment (" . __LINE__ . ") errno: " . $err->getAttribute("Err"));
+              if (!($res->userPaymentError->_value = $this->errs[$err->getAttribute("Err")])) 
+                $res->userPaymentError->_value = "unspecified error (" . $err->getAttribute("Err") . "), order not possible";
+            } else {
+              $res->userPaymentOk->_value = "true";
+            }
+          } else {
+            verbose::log(ERROR, "userPayment (" . __LINE__ . ") loadXML error of: " . $xml_ret["xmlUpdateDoc"]);
+            $res->userPaymentError->_value = "system error";
+          }
+        } else {
+          verbose::log(ERROR, "userPayment (" . __LINE__ . ") z-errno: " . $z->get_error_string());
+          $res->userPaymentError->_value = "system error";
+        }
+      } else
+        $res->userPaymentError->_value = "unknown agencyId";
     }
 
     $ret->userPayResponse->_value = $res;
-    //var_dump($param); var_dump($res); die();
+    //var_dump($param); print_r($res); die();
     return $ret;
   }
 
@@ -822,9 +1014,8 @@ class openRuth extends webServiceServer {
         $hits = $z->z3950_search($tgt["timeout"]);
         $this->watch->stop("zsearch");
         if ($err = $z->get_errno()) {
-          if ($err == 1103) $res->userError->_value = "unknown userId";
-          elseif ($err == 1104) $res->userError->_value = "wrong pin code";
-          else $res->userError->_value = "cannot reach local system - (" . $err . ")";
+          if (!($res->userError->_value = $this->errs[$err])) 
+            $res->userError->_value = "cannot reach local system - (" . $err . ")";
         } elseif (empty($hits))
           $res->userError->_value = "unknown userId";
         else {
@@ -975,6 +1166,7 @@ class openRuth extends webServiceServer {
                                       "Delvis fanget" => "partly retained", 
                                       "Aktiv" => "active", 
                                       "Registreret" => "registered")),
+              array("from" => "BookingNote", "to" => "bookingNote"),
               array("from" => "ServiceCounter", "to" => "agencyCounter"));
             foreach ($bookings->getElementsByTagName("Booking") as $b)
               $this->move_tags($b, $book->booking[]->_value, $trans);
