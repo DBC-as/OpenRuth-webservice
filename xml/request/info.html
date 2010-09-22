@@ -28,6 +28,11 @@ Actions and Parameters:
     <li>agencyId:</li> Id of the agency, like 123456 or DK-123456
     <li>bookingId:</li> Id of the booking
   </ul>
+  <li>cancelOrder</li>
+  <ul>
+    <li>agencyId:</li> Id of the agency, like 123456 or DK-123456
+    <li>orderId:</li> Id of the order
+  </ul>
   <li>holdings</li>
   <ul>
     <li>agencyId:</li> Id of the agency, like 123456 or DK-123456
@@ -46,6 +51,12 @@ Actions and Parameters:
     <li>itemId:</li> Id of item to order, repeatable
     <li>itemSerialPartId:</li> For serials, Serial Id, otherwise empty, repeatable
   </ul>
+  <li>renewLoan</li>
+  <ul>
+    <li>agencyId:</li> Id of the agency, like 123456 or DK-123456
+    <li>userId:</li> Id of the user
+    <li>copyId:</li> Id of copy(loan), repeatable
+  </ul>
   <li>updateBooking</li>
   <ul>
     <li>agencyId:</li> Id of the agency, like 123456 or DK-123456
@@ -56,11 +67,38 @@ Actions and Parameters:
     <li>bookingEndDate:</li> Date when a booking expires
     <li>bookingsCount:</li> Total number of copies of a booking
   </ul>
+  <li>updateOrder</li>
+  <ul>
+    <li>agencyId:</li> Id of the agency, like 123456 or DK-123456
+    <li>orderId:</li> Id of the order
+    <li>orderNote:</li> Note for the order
+    <li>orderLastInterestDate:</li> Last interest date like YYYY-MM-DD
+    <li>agencyCounter:</li> Pickup counter
+  </ul>
+  <li>updateUserInfo</li>
+  <ul>
+    <li>agencyId:</li> Id of the agency, like 123456 or DK-123456
+    <li>userId:</li> 
+    <li>userPinCodeOld:</li> 
+    <li>userPinCodeNew:</li> 
+    <li>userEmail:</li> 
+    <li>userMobilePhone:</li> 
+    <li>userPreReturnMessage:</li> 
+    <li>userFirstName:</li> 
+    <li>userLastName:</li> 
+    <li>agencyCounter:</li> 
+  </ul>
   <li>userCheck</li>
   <ul>
     <li>agencyId:</li> Id of the agency, like 123456 or DK-123456
     <li>userId:</li> Id of the user
     <li>userPinCode:</li> Pincode to the user Id
+  </ul>
+  <li>userPayment</li>
+  <ul>
+    <li>agencyId:</li> Id of the agency, like 123456 or DK-123456
+    <li>userId:</li> Id of the user
+    <li>fineAmountPaid:</li> Amount paid of fines
   </ul>
   <li>userStatus</li>
   <ul>
