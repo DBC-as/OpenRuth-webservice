@@ -1648,8 +1648,10 @@
 	</xs:simpleType>
 	<xs:simpleType name="userPaymentErrorType">
 		<xs:restriction base="xs:string">
+			<xs:enumeration value="unknown agencyId"/>
 			<xs:enumeration value="unknown userId"/>
 			<xs:enumeration value="amount is not the full amount"/>
+			<xs:enumeration value="system error"/>
 		</xs:restriction>
 	</xs:simpleType>
 	<xs:simpleType name="userPreReturnReminderType">
