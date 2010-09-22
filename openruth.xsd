@@ -506,6 +506,7 @@
 				<xs:element ref="or:bookingStartDate"/>
 				<xs:element ref="or:bookingEndDate"/>
 				<xs:element ref="or:bookingStatus"/>
+				<xs:element ref="or:bookingNote"/>
 				<xs:element ref="or:agencyCounter"/>
 			</xs:sequence>
 		</xs:complexType>
