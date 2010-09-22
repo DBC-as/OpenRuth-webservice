@@ -31,7 +31,7 @@ soapAction[updateOrder] = updateOrderRequest
 soapAction[renewLoan] = renewLoanRequest
 soapAction[updateUserInfo] = updateUserInfoRequest
 soapAction[userCheck] = userCheckRequest
-soapAction[userPayment] = usermentPayRequest
+soapAction[userPayment] = userPaymentRequest
 soapAction[userStatus] = userStatusRequest
 
 
