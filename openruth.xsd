@@ -1088,9 +1088,9 @@
 			<xs:documentation xml:lang="en">Priority of an order</xs:documentation>
 		</xs:annotation>
 	</xs:element>
-	<xs:element name="orderQuePosition" type="xs:integer">
+	<xs:element name="orderQueuePosition" type="xs:integer">
 		<xs:annotation>
-			<xs:documentation xml:lang="en">Information about an user's position in the reservation que for a given item</xs:documentation>
+			<xs:documentation xml:lang="en">Information about an user's position in the reservation queue for a given item</xs:documentation>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="orderType" type="or:orderTypeType">
@@ -1129,7 +1129,7 @@
 				<xs:element ref="or:orderDate"/>
 				<xs:element ref="or:orderLastInterestDate"/>
 				<xs:element ref="or:orderPriority" minOccurs="0"/>
-				<xs:element ref="or:orderQuePosition"/>
+				<xs:element ref="or:orderQueuePosition"/>
 				<xs:element ref="or:agencyCounter"/>
 				<xs:element ref="or:orderNote" minOccurs="0"/>
 				<xs:element ref="or:orderType"/>
