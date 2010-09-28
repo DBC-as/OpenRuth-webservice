@@ -1396,7 +1396,7 @@
 			<xs:documentation xml:lang="en">Error messages related to userPaymentRequest</xs:documentation>
 		</xs:annotation>
 	</xs:element>
-	<xs:element name="userPaymentOk">
+	<xs:element name="userPaymentOk" type="xs:string">
 		<xs:annotation>
 			<xs:documentation xml:lang="en">Indicator that userPaymentRequest is accepted</xs:documentation>
 		</xs:annotation>
