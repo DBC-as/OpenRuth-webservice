@@ -56,8 +56,8 @@
 			<xs:sequence>
 				<xs:element ref="or:agencyId"/>
 				<xs:element ref="or:userId"/>
-				<xs:element ref="or:agencyCounter"/>
-				<xs:element ref="or:bookingNote"/>
+				<xs:element ref="or:agencyCounter" minOccurs="0"/>
+				<xs:element ref="or:bookingNote" minOccurs="0"/>
 				<xs:element ref="or:bookingStartDate"/>
 				<xs:element ref="or:bookingEndDate"/>
 				<xs:element ref="or:bookingTotalCount"/>
@@ -201,7 +201,7 @@
 				<xs:element ref="or:bookingNote" minOccurs="0"/>
 				<xs:element ref="or:bookingStartDate" minOccurs="0"/>
 				<xs:element ref="or:bookingEndDate" minOccurs="0"/>
-				<xs:element ref="or:bookingsCount" minOccurs="0"/>
+				<xs:element ref="or:bookingTotalCount" minOccurs="0"/>
 				<xs:element ref="or:callback" minOccurs="0"/>
 				<xs:element ref="or:outputType" minOccurs="0"/>
 			</xs:sequence>
