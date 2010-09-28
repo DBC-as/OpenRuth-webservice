@@ -247,7 +247,7 @@
 			<xs:sequence>
 				<xs:element ref="or:agencyId"/>
 				<xs:element ref="or:userId"/>
-				<xs:element ref="or:userPinCodeOld" minOccurs="0"/>
+				<xs:element ref="or:userPinCode"/>
 				<xs:element ref="or:userPinCodeNew" minOccurs="0"/>
 				<xs:element ref="or:userEmail" minOccurs="0"/>
 				<xs:element ref="or:userMobilePhone" minOccurs="0"/>
@@ -588,6 +588,7 @@
 		<xs:complexType>
 			<xs:sequence>
 				<xs:element ref="or:bookingId"/>
+				<xs:element ref="or:bookingStartDate"/>
 				<xs:element ref="or:bookingEndDate"/>
 			</xs:sequence>
 		</xs:complexType>
@@ -1409,11 +1410,6 @@
 	<xs:element name="userPinCodeOk" type="xs:boolean">
 		<xs:annotation>
 			<xs:documentation xml:lang="en">Boolean indicating whether the user's pincode is ok</xs:documentation>
-		</xs:annotation>
-	</xs:element>
-	<xs:element name="userPinCodeOld" type="xs:string">
-		<xs:annotation>
-			<xs:documentation xml:lang="en">User's current pin code (used for pin code change)</xs:documentation>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="userPinCodeNew" type="xs:string">
