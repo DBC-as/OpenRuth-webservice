@@ -1518,6 +1518,7 @@
 			<xs:enumeration value="ILL, not found"/>
 			<xs:enumeration value="ILL, not cancelled"/>
 			<xs:enumeration value="system error"/>
+			<xs:enumeration value="unknown agencyId"/>
 		</xs:restriction>
 	</xs:simpleType>
 	<xs:simpleType name="fineTypeType">
