@@ -652,7 +652,7 @@
 			<xs:documentation xml:lang="en">Number of copies held at a given location</xs:documentation>
 		</xs:annotation>
 	</xs:element>
-	<xs:element name="copyId" type="xs:integer">
+	<xs:element name="copyId" type="xs:string">
 		<xs:annotation>
 			<xs:documentation xml:lang="en">Unique identifier of a copy of an item</xs:documentation>
 		</xs:annotation>
@@ -831,7 +831,7 @@
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
-	<xs:element name="itemId" type="xs:integer">
+	<xs:element name="itemId" type="xs:string">
 		<xs:annotation>
 			<xs:documentation xml:lang="en">Unique identifier of an item (eg. FAUST number)</xs:documentation>
 		</xs:annotation>
@@ -863,7 +863,7 @@
 			<xs:documentation xml:lang="en">Partitle of a serial publication</xs:documentation>
 		</xs:annotation>
 	</xs:element>
-	<xs:element name="itemSerialPartId" type="xs:integer">
+	<xs:element name="itemSerialPartId" type="xs:string">
 		<xs:annotation>
 			<xs:documentation xml:lang="en">Identifier of a part of periodcal or other serial publication. Used in relation with itemId. If 0, empty or not present, item is not part of a serial</xs:documentation>
 		</xs:annotation>
@@ -1298,14 +1298,14 @@
 			<xs:documentation xml:lang="en">User's e-mail adress</xs:documentation>
 		</xs:annotation>
 	</xs:element>
-	<xs:element name="userError" type="or:userErrorType">
-		<xs:annotation>
-			<xs:documentation xml:lang="en">Errors related to requests about user info</xs:documentation>
-		</xs:annotation>
-	</xs:element>
 	<xs:element name="userFeesTotal">
 		<xs:annotation>
 			<xs:documentation xml:lang="en">total amount of money that a user owes the library, including userFinesTotal</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="userError" type="or:userErrorType">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">Errors related to requests about user info</xs:documentation>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="userFirstName" type="xs:string">
@@ -1323,7 +1323,7 @@
 			<xs:documentation xml:lang="en">Boolean indicating whether user is no longer associated with the agency</xs:documentation>
 		</xs:annotation>
 	</xs:element>
-	<xs:element name="userId" type="xs:integer">
+	<xs:element name="userId" type="xs:string">
 		<xs:annotation>
 			<xs:documentation xml:lang="en">Identifier of user in the local system (often cpr)</xs:documentation>
 		</xs:annotation>
@@ -1401,7 +1401,7 @@
 			<xs:documentation xml:lang="en">Indicator that userPaymentRequest is accepted</xs:documentation>
 		</xs:annotation>
 	</xs:element>
-	<xs:element name="userPinCode" type="xs:integer">
+	<xs:element name="userPinCode" type="xs:string">
 		<xs:annotation>
 			<xs:documentation xml:lang="en">User's pin code in local system</xs:documentation>
 		</xs:annotation>
@@ -1411,12 +1411,12 @@
 			<xs:documentation xml:lang="en">Boolean indicating whether the user's pincode is ok</xs:documentation>
 		</xs:annotation>
 	</xs:element>
-	<xs:element name="userPinCodeOld" type="xs:integer">
+	<xs:element name="userPinCodeOld" type="xs:string">
 		<xs:annotation>
 			<xs:documentation xml:lang="en">User's current pin code (used for pin code change)</xs:documentation>
 		</xs:annotation>
 	</xs:element>
-	<xs:element name="userPinCodeNew" type="xs:integer">
+	<xs:element name="userPinCodeNew" type="xs:string">
 		<xs:annotation>
 			<xs:documentation xml:lang="en">User's new pin code (used for pin code change)</xs:documentation>
 		</xs:annotation>
