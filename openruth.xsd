@@ -581,10 +581,16 @@
 			<xs:documentation xml:lang="en">Text note related to a booking</xs:documentation>
 		</xs:annotation>
 	</xs:element>
-	<xs:element name="bookingOk" type="xs:string">
+	<xs:element name="bookingOk">
 		<xs:annotation>
 			<xs:documentation xml:lang="en">Message that bookItemRequest has been accepted</xs:documentation>
 		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="or:bookingId"/>
+				<xs:element ref="or:bookingEndDate"/>
+			</xs:sequence>
+		</xs:complexType>
 	</xs:element>
 	<xs:element name="bookingReturnedCount" type="xs:integer">
 		<xs:annotation>
