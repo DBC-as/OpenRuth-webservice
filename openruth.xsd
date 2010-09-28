@@ -588,8 +588,8 @@
 		<xs:complexType>
 			<xs:sequence>
 				<xs:element ref="or:bookingId"/>
-				<xs:element ref="or:bookingStartDate"/>
-				<xs:element ref="or:bookingEndDate"/>
+				<xs:element ref="or:bookingStartDate" minOccurs="0"/>
+				<xs:element ref="or:bookingEndDate" minOccurs="0"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
