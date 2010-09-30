@@ -1573,6 +1573,7 @@
 			<xs:enumeration value="first recall"/>
 			<xs:enumeration value="second recall"/>
 			<xs:enumeration value="third recall"/>
+			<xs:enumeration value="none"/>
 		</xs:restriction>
 	</xs:simpleType>
 	<xs:simpleType name="loanRenewableType">
