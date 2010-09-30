@@ -1527,7 +1527,6 @@
 		<xs:restriction base="xs:string">
 			<xs:enumeration value="compensation"/>
 			<xs:enumeration value="first recall"/>
-			<xs:enumeration value="penalty"/>
 			<xs:enumeration value="second recall"/>
 			<xs:enumeration value="third recall"/>
 			<xs:enumeration value="penalty"/>
