@@ -454,9 +454,9 @@
 		</xs:annotation>
 		<xs:complexType>
 			<xs:sequence>
+				<xs:element ref="or:agencyId"/>
 				<xs:element ref="or:agencyName"/>
 				<xs:element ref="or:agencyFullName"/>
-				<xs:element ref="or:agencyId"/>
 				<xs:element ref="or:itemAvailability"/>
 			</xs:sequence>
 		</xs:complexType>
@@ -507,7 +507,7 @@
 				<xs:element ref="or:bookingStartDate"/>
 				<xs:element ref="or:bookingEndDate"/>
 				<xs:element ref="or:bookingStatus"/>
-				<xs:element ref="or:bookingNote"/>
+				<xs:element ref="or:bookingNote" minOccurs="0"/>
 				<xs:element ref="or:agencyCounter"/>
 			</xs:sequence>
 		</xs:complexType>
@@ -553,7 +553,7 @@
 			<xs:documentation xml:lang="en">Number of copies fetched of a booked item</xs:documentation>
 		</xs:annotation>
 	</xs:element>
-	<xs:element name="bookingId" type="xs:dateTime">
+	<xs:element name="bookingId" type="xs:string">
 		<xs:annotation>
 			<xs:documentation xml:lang="en">dateTime stamp serving as a unique local identifier of a booking</xs:documentation>
 		</xs:annotation>
@@ -790,9 +790,9 @@
 		</xs:annotation>
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element ref="or:agencyCollectionId"/>
 				<xs:element ref="or:bookingAllowed"/>
 				<xs:element ref="or:orderAllowed"/>
+				<xs:element ref="or:agencyCollectionId"/>
 				<xs:element ref="or:agencyBranchId" minOccurs="0"/>
 				<xs:element ref="or:agencyDepartmentId" minOccurs="0"/>
 				<xs:element ref="or:agencyPlacementId" minOccurs="0"/>
@@ -844,9 +844,9 @@
 		</xs:annotation>
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element ref="or:agencyCollectionId"/>
 				<xs:element ref="or:bookingAllowed"/>
 				<xs:element ref="or:orderAllowed"/>
+				<xs:element ref="or:agencyCollectionId"/>
 				<xs:element ref="or:agencyBranchId" minOccurs="0"/>
 				<xs:element ref="or:agencyDepartmentId" minOccurs="0"/>
 				<xs:element ref="or:agencyPlacementId" minOccurs="0"/>
@@ -1133,12 +1133,12 @@
 				<xs:element ref="or:itemTitle" minOccurs="0"/>
 				<xs:element ref="or:itemPublicationYear" minOccurs="0"/>
 				<xs:element ref="or:itemSerialPartTitle" minOccurs="0"/>
+				<xs:element ref="or:agencyCounter"/>
 				<xs:element ref="or:orderId"/>
 				<xs:element ref="or:orderDate"/>
 				<xs:element ref="or:orderLastInterestDate"/>
 				<xs:element ref="or:orderPriority" minOccurs="0"/>
 				<xs:element ref="or:orderQueuePosition"/>
-				<xs:element ref="or:agencyCounter"/>
 				<xs:element ref="or:orderNote" minOccurs="0"/>
 				<xs:element ref="or:orderType"/>
 				<xs:element ref="or:orderExpectedAvailabilityDate" minOccurs="0"/>
@@ -1157,7 +1157,7 @@
 				<xs:element ref="or:itemPublicationYear" minOccurs="0"/>
 				<xs:element ref="or:itemSerialPartTitle" minOccurs="0"/>
 				<xs:element ref="or:agencyCounter"/>
-				<xs:element ref="or:orderPickUpDate"/>
+				<xs:element ref="or:orderPickUpDate" minOccurs="0"/>
 				<xs:element ref="or:orderFetchedDate"/>
 				<xs:element ref="or:orderPickUpId" minOccurs="0"/>
 				<xs:element ref="or:orderId"/>
@@ -1529,6 +1529,7 @@
 			<xs:enumeration value="first recall"/>
 			<xs:enumeration value="second recall"/>
 			<xs:enumeration value="third recall"/>
+			<xs:enumeration value="penalty"/>
 		</xs:restriction>
 	</xs:simpleType>
 	<xs:simpleType name="illStatusType">
