@@ -5,8 +5,7 @@
       <open:updateUserInfoRequest>
          <open:agencyId>?</open:agencyId>
          <open:userId>?</open:userId>
-         <!--Optional:-->
-         <open:userPinCodeOld>?</open:userPinCodeOld>
+         <open:userPinCode>?</open:userPinCode>
          <!--Optional:-->
          <open:userPinCodeNew>?</open:userPinCodeNew>
          <!--Optional:-->
@@ -14,7 +13,7 @@
          <!--Optional:-->
          <open:userMobilePhone>?</open:userMobilePhone>
          <!--Optional:-->
-         <open:userPreReturnMessage>?</open:userPreReturnMessage>
+         <open:userPreReturnReminder>?</open:userPreReturnReminder>
          <!--Optional:-->
          <open:userFirstName>?</open:userFirstName>
          <!--Optional:-->

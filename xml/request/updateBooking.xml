@@ -14,7 +14,7 @@
          <!--Optional:-->
          <open:bookingEndDate>?</open:bookingEndDate>
          <!--Optional:-->
-         <open:bookingsCount>?</open:bookingsCount>
+         <open:bookingTotalCount>?</open:bookingTotalCount>
          <!--Optional:-->
          <open:callback>?</open:callback>
          <!--Optional:-->
