@@ -1088,7 +1088,7 @@ class openRuth extends webServiceServer {
               array("from" => "Title", "to" => "itemDisplayTitle"),
               array("from" => "Amount", "to" => "fineAmount", "decimal" => TRUE),
               array("from" => "Payed", "to" => "fineAmountPaid"),
-              array("from" => "ServiceType", "to" => "fineType", "enum" => array("1" => "first recall", "2" => "second recall", "3" => "third recall", "c" => "compensation", "p" => "penalty")),
+              array("from" => "ServiceType", "to" => "fineType", "enum" => array("1" => "first recall", "2" => "second recall", "3" => "third recall", "d" => "d", "c" => "compensation", "p" => "penalty")),
               array("from" => "InvoiceNo", "to" => "fineInvoiceNumber"));
             foreach ($dom->getElementsByTagName("Fines") as $fines)
               foreach ($fines->getElementsByTagName("Fine") as $fine)
@@ -1106,7 +1106,7 @@ class openRuth extends webServiceServer {
               array("from" => "LoanCat", "to" => "loanCategory"),
               array("from" => "MatAtHome", "to" => "loanCategoryCount"));
             $trans_2 = array(
-              array("from" => "RecallType", "to" => "loanRecallType", "enum" => array("0" => "none", "Late" => "late", "Recall1" => "first recall", "Recall2" => "second recall", "Recall3" => "third recall", "c" => "compensation")),
+              array("from" => "RecallType", "to" => "loanRecallType", "enum" => array("0" => "none", "Late" => "late", "Recall1" => "first recall", "Recall2" => "second recall", "Recall3" => "third recall", "Compensation" => "compensation")),
               array("from" => "Number", "to" => "loanRecallTypeCount "));
             foreach ($dom->getElementsByTagName("Status") as $status) {
               foreach ($status->getElementsByTagName("CategoryLoans") as $c_los)
@@ -1124,7 +1124,7 @@ class openRuth extends webServiceServer {
               array("from" => "ReturnDate", "to" => "loanReturnDate", "date" => "swap"),
               array("from" => "LastRenewal", "to" => "loanLastRenewedDate", "date" => "swap"),
               array("from" => "LoanStatus", "to" => "loanStatus"),
-              array("from" => "RecallType", "to" => "loanRecallType", "enum" => array("0" => "none", "Late" => "late", "Recall1" => "first recall", "Recall2" => "second recall", "Recall3" => "third recall", "c" => "compensation")),
+              array("from" => "RecallType", "to" => "loanRecallType", "enum" => array("0" => "none", "Late" => "late", "1" => "first recall", "2" => "second recall", "3" => "third recall", "c" => "compensation")),
               array("from" => "RecallDate", "to" => "loanRecallDate", "date" => "swap"),
               array("from" => "CanRenew", "to" => "loanRenewable", "enum" => array("0" => "renewable", "1" => "not renewable", "2" => "ILL, renewable", "3" => "ILL, not renewable")));
             foreach ($loans->getElementsByTagName("Loan") as $loan)
