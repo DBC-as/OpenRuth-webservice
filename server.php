@@ -240,7 +240,7 @@ class openRuth extends webServiceServer {
                         $trans = array(
                           array("from" => "HOME", "to" => "copiesAvailableCount"),
                           array("from" => "TOTAL", "to" => "copiesCount"),
-                          array("from" => "DELIVERYDATE", "to" => "itemExpectedDelivery", "date" => "swap"));
+                          array("from" => "DELIVERYDATE", "to" => "itemExpectedDeliveryDate", "date" => "swap"));
                         $this->move_tags($location, $res_loc, $trans);
                         $res_hold->_value->itemHoldings[] = $res_item;
                         unset($res_loc);
@@ -382,12 +382,24 @@ class openRuth extends webServiceServer {
           $dom = new DomDocument();
           $dom->preserveWhiteSpace = false;
           if ($dom->loadXML($xml_ret["xmlUpdateDoc"])) {
-            if ($err = $dom->getElementsByTagName("Error")->item(0)->nodeValue) {
+            if ($err = $dom->getElementsByTagName("ErrorResponse")->item(0)) {
+              verbose::log(ERROR, "book (" . __LINE__ . ") errno: " . $err->getAttribute("Err"));
+              if (!($res->bookingError->_value = $this->errs[$err->getAttribute("Err")])) 
+                $res->bookingError->_value = "unspecified error (" . $err->getAttribute("Err") . "), order not possible";
+            } elseif ($err = $dom->getElementsByTagName("Error")->item(0)->nodeValue) {
               verbose::log(ERROR, "book (" . __LINE__ . ") errno: " . $err);
               if (!($res->bookingError->_value = $this->errs[$err])) 
                 $res->bookingError->_value = "unspecified error (" . $err . "), order not possible";
             } else {
-              $res->bookingOk->_value = $dom->getElementsByTagName("BookingID")->item(0)->nodeValue;
+              $res->bookingOk->_value->bookingId->_value = $dom->getElementsByTagName("BookingID")->item(0)->nodeValue;
+              if ($sd = $this->from_zruth_date($dom->getElementsByTagName("StartDate")->item(0)->nodeValue))
+                $res->bookingOk->_value->bookingStartDate->_value = $sd;
+              else
+                $res->bookingOk->_value->bookingStartDate->_value = $param->bookingStartDate->_value;
+              if ($ed = $this->from_zruth_date($dom->getElementsByTagName("EndDate")->item(0)->nodeValue))
+                $res->bookingOk->_value->bookingEndDate->_value = $ed;
+              else
+                $res->bookingOk->_value->bookingEndDate->_value = $param->bookingEndDate->_value;
             }
           } else {
             verbose::log(ERROR, "book (" . __LINE__ . ") loadXML error of: " . $xml_ret["xmlUpdateDoc"]);
@@ -425,7 +437,7 @@ class openRuth extends webServiceServer {
         $book->BookingNote->_value = $param->bookingNote->_value;
         $book->StartDate->_value = $this->to_zruth_date($param->bookingStartDate->_value);
         $book->EndDate->_value = $this->to_zruth_date($param->bookingEndDate->_value);
-        $book->NumberOrdered->_value = $param->bookingsCount->_value;
+        $book->NumberOrdered->_value = $param->bookingTotalCount->_value;
         $book->ServiceCounter->_value = $param->agencyCounter->_value;
         $xml = '<?xml version="1.0" encoding="UTF-8" ?'.'>' . $this->objconvert->obj2xml($booking);
         $z = new z3950();
@@ -440,12 +452,24 @@ class openRuth extends webServiceServer {
           $dom = new DomDocument();
           $dom->preserveWhiteSpace = false;
           if ($dom->loadXML($xml_ret["xmlUpdateDoc"])) {
-            if ($err = $dom->getElementsByTagName("Error")->item(0)->nodeValue) {
+            if ($err = $dom->getElementsByTagName("ErrorResponse")->item(0)) {
+              verbose::log(ERROR, "updateBook (" . __LINE__ . ") errno: " . $err->getAttribute("Err"));
+              if (!($res->updateOrderError->_value = $this->errs[$err->getAttribute("Err")])) 
+                $res->updateOrderError->_value = "unspecified error (" . $err->getAttribute("Err") . "), order not possible";
+            } elseif ($err = $dom->getElementsByTagName("Error")->item(0)->nodeValue) {
               verbose::log(ERROR, "updateBook (" . __LINE__ . ") errno: " . $err);
               if (!($res->bookingError->_value = $this->errs[$err])) 
                 $res->bookingError->_value = "unspecified error (" . $err . "), order not possible";
             } else {
-              $res->bookingOk->_value = $param->bookingId->_value;
+              $res->bookingOk->_value->bookingId->_value = $param->bookingId->_value;
+              if ($sd = $this->from_zruth_date($dom->getElementsByTagName("StartDate")->item(0)->nodeValue))
+                $res->bookingOk->_value->bookingStartDate->_value = $sd;
+              elseif ($sd = $param->bookingStartDate->_value)
+                $res->bookingOk->_value->bookingStartDate->_value = $sd;
+              if ($ed = $this->from_zruth_date($dom->getElementsByTagName("EndDate")->item(0)->nodeValue))
+                $res->bookingOk->_value->bookingEndDate->_value = $ed;
+              elseif ($ed = $param->bookingEndDate->_value)
+                $res->bookingOk->_value->bookingEndDate->_value = $ed;
             }
           } else {
             verbose::log(ERROR, "updateBook (" . __LINE__ . ") loadXML error of: " . $xml_ret["xmlUpdateDoc"]);
@@ -498,7 +522,7 @@ class openRuth extends webServiceServer {
               if (!($res->bookingError->_value = $this->errs[$err->getAttribute("Err")])) 
                 $res->bookingError->_value = "unspecified error (" . $err->getAttribute("Err") . "), order not possible";
             } else {
-              $res->bookingOk->_value = $param->bookingId->_value;
+              $res->bookingOk->_value->bookingId->_value = $param->bookingId->_value;
             }
           } else {
             verbose::log(ERROR, "cancelBook (" . __LINE__ . ") loadXML error of: " . $xml_ret["xmlUpdateDoc"]);
@@ -801,8 +825,8 @@ class openRuth extends webServiceServer {
 
   /** \brief 
    *
-   * @param $param agencyId, userId, userPinCodeOld, userPinCodeNew, userEmail, userMobilePhone, 
-   *               userPreReturnMessage, userFirstName, userLastName, agencyCounter
+   * @param $param agencyId, userId, userPinCode, userPinCodeNew, userEmail, userMobilePhone, 
+   *               userPreReturnReminder, userFirstName, userLastName, agencyCounter
    * @return
    *
    */
@@ -816,11 +840,15 @@ class openRuth extends webServiceServer {
         $bor = &$borrower->BorrowerPinMail->_value;
         $bor->LibraryNo->_value = $agencyId;
         $bor->BorrowerTicketNo->_value = $param->userId->_value;
-        $bor->OldPinCode->_value = $param->userPinCodeOld->_value;
+        $bor->OldPinCode->_value = $param->userPinCode->_value;
         if ($param->userPinCodeNew->_value) $bor->NewPinCode->_value = $param->userPinCodeNew->_value;
         if ($param->userEmail->_value) $bor->Email->_value = $param->userEmail->_value;
         if ($param->userMobilePhone->_value) $bor->MobilePhone->_value = $param->userMobilePhone->_value;
-        if ($param->userPreReturnMessage->_value) $bor->UsePreReturnMsg->_value = $param->userPreReturnMessage->_value;
+        if ($param->userPreReturnReminder->_value)
+          if (in_array($param->userPreReturnReminder->_value, array("sms", "email", "both")))
+            $bor->UsePreReturnMsg->_value = $param->userPreReturnReminder->_value;
+          else
+            $bor->UsePreReturnMsg->_value = "none";
         if ($param->userFirstName->_value) $bor->FirstName->_value = $param->userFirstName->_value;
         if ($param->userLastName->_value) $bor->FamilyName->_value = $param->userLastName->_value;
         if ($param->agencyCounter->_value) $bor->StandardCounter->_value = $param->agencyCounter->_value;
@@ -936,7 +964,7 @@ class openRuth extends webServiceServer {
 
   /** \brief 
    *
-   * @param $param - agencyId, userId, fineAmountPaid
+   * @param $param - agencyId, userId, fineAmountPaid, userPaymentTransactionId
    * @return 
    *
    */
@@ -951,7 +979,7 @@ class openRuth extends webServiceServer {
         $pay->LibraryNo->_value = $agencyId;
         $pay->BorrowerTicketNo->_value = $param->userId->_value;
         $pay->Amount->_value = $param->fineAmountPaid->_value;
-        ///$pay->TransactionID->_value = $param->???->_value;
+        $pay->TransactionID->_value = $param->userPaymentTransactionId->_value;
         $xml = '<?xml version="1.0" encoding="UTF-8" ?'.'>' . $this->objconvert->obj2xml($payment);
         $z = new z3950();
         $z->set_target($tgt["host"]);
@@ -984,7 +1012,7 @@ class openRuth extends webServiceServer {
         $res->userPaymentError->_value = "unknown agencyId";
     }
 
-    $ret->userPayResponse->_value = $res;
+    $ret->userPaymentResponse->_value = $res;
     //var_dump($param); print_r($res); die();
     return $ret;
   }
@@ -1041,7 +1069,7 @@ class openRuth extends webServiceServer {
               array("from" => "AttName", "to" => "userAttName"),
               array("from" => "CoName", "to" => "userCoName"),
               array("from" => "Pincode", "to" => "userPinCode"),
-              array("from" => "Email", "to" => "userEmail"),
+              array("from" => "EmailAddress", "to" => "userEmail"),
               array("from" => "StandardCounter", "to" => "agencyCounter"),
               array("from" => "ReservationAllowed", "to" => "userOrderAllowed", "bool" => "y"),
               array("from" => "BookingAllowed", "to" => "userBookingAllowed", "bool" => "y"),
@@ -1058,9 +1086,9 @@ class openRuth extends webServiceServer {
               array("from" => "ServiceDate", "to" => "fineDate", "date" => "swap"),
               array("from" => "ServiceCounter", "to" => "agencyCounter"),
               array("from" => "Title", "to" => "itemDisplayTitle"),
-              array("from" => "Amount", "to" => "fineAmount"),
+              array("from" => "Amount", "to" => "fineAmount", "decimal" => TRUE),
               array("from" => "Payed", "to" => "fineAmountPaid"),
-              array("from" => "ServiceType", "to" => "fineType", "enum" => array("Recall1" => "first recall", "Recall2" => "second recall", "Recall3" => "third recall", "Compensation" => "compensation")),
+              array("from" => "ServiceType", "to" => "fineType", "enum" => array("1" => "first recall", "2" => "second recall", "3" => "third recall", "c" => "compensation", "p" => "penalty")),
               array("from" => "InvoiceNo", "to" => "fineInvoiceNumber"));
             foreach ($dom->getElementsByTagName("Fines") as $fines)
               foreach ($fines->getElementsByTagName("Fine") as $fine)
@@ -1078,7 +1106,7 @@ class openRuth extends webServiceServer {
               array("from" => "LoanCat", "to" => "loanCategory"),
               array("from" => "MatAtHome", "to" => "loanCategoryCount"));
             $trans_2 = array(
-              array("from" => "RecallType", "to" => "loanRecallType", "enum" => array("Late" => "late", "Recall1" => "first recall", "Recall2" => "second recall", "Recall3" => "third recall", "Compensation" => "compensation")),
+              array("from" => "RecallType", "to" => "loanRecallType", "enum" => array("0" => "none", "Late" => "late", "Recall1" => "first recall", "Recall2" => "second recall", "Recall3" => "third recall", "c" => "compensation")),
               array("from" => "Number", "to" => "loanRecallTypeCount "));
             foreach ($dom->getElementsByTagName("Status") as $status) {
               foreach ($status->getElementsByTagName("CategoryLoans") as $c_los)
@@ -1096,7 +1124,7 @@ class openRuth extends webServiceServer {
               array("from" => "ReturnDate", "to" => "loanReturnDate", "date" => "swap"),
               array("from" => "LastRenewal", "to" => "loanLastRenewedDate", "date" => "swap"),
               array("from" => "LoanStatus", "to" => "loanStatus"),
-              array("from" => "RecallType", "to" => "loanRecallType", "enum" => array("Late" => "late", "Recall1" => "first recall", "Recall2" => "second recall", "Recall3" => "third recall", "Compensation" => "compensation")),
+              array("from" => "RecallType", "to" => "loanRecallType", "enum" => array("0" => "none", "Late" => "late", "Recall1" => "first recall", "Recall2" => "second recall", "Recall3" => "third recall", "c" => "compensation")),
               array("from" => "RecallDate", "to" => "loanRecallDate", "date" => "swap"),
               array("from" => "CanRenew", "to" => "loanRenewable", "enum" => array("0" => "renewable", "1" => "not renewable", "2" => "ILL, renewable", "3" => "ILL, not renewable")));
             foreach ($loans->getElementsByTagName("Loan") as $loan)
@@ -1118,7 +1146,7 @@ class openRuth extends webServiceServer {
               array("from" => "CollectNo", "to" => "orderPickUpId"),
               array("from" => "DisposalID", "to" => "orderId"),
               array("from" => "CreationDate", "to" => "orderDate", "date" => "swap"),
-              array("from" => "Arrived", "to" => "orderArrived", "bool" => "y"));
+              array("from" => "Arrived", "to" => "orderArrived", "bool" => "true"));
             foreach ($rsr->getElementsByTagName("ReservationReady") as $r)
               $this->move_tags($r, $ord->ordersReady[]->_value, $trans);
             $rsnr = &$reservations->getElementsByTagName("ReservationsNotReady")->item(0);
@@ -1137,9 +1165,10 @@ class openRuth extends webServiceServer {
               array("from" => "Arrived", "to" => "orderArrived", "bool" => "y"),
               array("from" => "LastUseDate", "to" => "orderLastInterestDate", "date" => "swap"),
               array("from" => "Priority", "to" => "orderPriority", "enum" => array("1" => "express", "2" => "high", "3" => "normal")),
-              array("from" => "QueNumber", "to" => "orderQuePosition"),
+              array("from" => "QueNumber", "to" => "orderQueuePosition"),
               array("from" => "DisposalNote", "to" => "orderNote"),
-              array("from" => "DisposalType", "to" => "orderType", "enum" => array("0" => "booking", "1" => "reservation", "2" => "ILL")));
+              array("from" => "DisposalType", "to" => "orderType", "enum" => array("0" => "booking", "1" => "reservation", "2" => "ILL")),
+              array("from" => "ExpectedDelivery", "to" => "orderExpectedAvailabilityDate", "date" => "swap"));
             foreach ($rsnr->getElementsByTagName("ReservationNotReady") as $r)
               $this->move_tags($r, $ord->ordersNotReady[]->_value, $trans);
 
@@ -1262,9 +1291,25 @@ class openRuth extends webServiceServer {
         elseif ($node_val <> NULL)
           if ($tag["date"] == "swap")
             $to->{$tag["to"]}[]->_value = $this->from_zruth_date($node_val);
+          elseif ($tag["decimal"])
+            $to->{$tag["to"]}[]->_value = $this->from_zruth_decimal($node_val);
           else
             $to->{$tag["to"]}[]->_value = $node_val;
       }
+  }
+
+ /** \brief
+  *  return converts from nnn.nn to nnn,nn
+  */
+  private function to_zruth_decimal($dec) {
+    return str_replace(".", ",", $dec);
+  }
+
+ /** \brief
+  *  return converts from nnn,nn to nnn.nn
+  */
+  private function from_zruth_decimal($dec) {
+    return str_replace(",", ".", $dec);
   }
 
  /** \brief
