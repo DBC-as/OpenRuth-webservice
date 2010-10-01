@@ -1112,8 +1112,8 @@
 		</xs:annotation>
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element ref="or:ordersReady" minOccurs="0" maxOccurs="unbounded"/>
-				<xs:element ref="or:ordersNotReady" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="or:orderReady" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="or:orderNotReady" minOccurs="0" maxOccurs="unbounded"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
@@ -1122,9 +1122,9 @@
 			<xs:documentation xml:lang="en">Number of reservations on a given item</xs:documentation>
 		</xs:annotation>
 	</xs:element>
-	<xs:element name="ordersNotReady">
+	<xs:element name="orderNotReady">
 		<xs:annotation>
-			<xs:documentation xml:lang="en">Details about orders that are not yet fullfilled/ready for pickup</xs:documentation>
+			<xs:documentation xml:lang="en">Details about an order that is not yet fullfilled/ready for pickup</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:sequence>
@@ -1145,9 +1145,9 @@
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
-	<xs:element name="ordersReady">
+	<xs:element name="orderReady">
 		<xs:annotation>
-			<xs:documentation xml:lang="en">Details about orders that are fullfilled/ready for pickup</xs:documentation>
+			<xs:documentation xml:lang="en">Details about an order that is fullfilled/ready for pickup</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:sequence>
