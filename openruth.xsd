@@ -56,7 +56,7 @@
 			<xs:sequence>
 				<xs:element ref="or:agencyId"/>
 				<xs:element ref="or:userId"/>
-				<xs:element ref="or:agencyCounter" minOccurs="0"/>
+				<xs:element ref="or:agencyCounter"/>
 				<xs:element ref="or:bookingNote" minOccurs="0"/>
 				<xs:element ref="or:bookingStartDate"/>
 				<xs:element ref="or:bookingEndDate"/>
@@ -1530,6 +1530,9 @@
 			<xs:enumeration value="second recall"/>
 			<xs:enumeration value="third recall"/>
 			<xs:enumeration value="penalty"/>
+			<xs:enumeration value="reminder"/>
+			<xs:enumeration value="reservation"/>
+			<xs:enumeration value="other"/>
 		</xs:restriction>
 	</xs:simpleType>
 	<xs:simpleType name="illStatusType">
