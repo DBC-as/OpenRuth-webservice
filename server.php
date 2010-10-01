@@ -1088,7 +1088,7 @@ class openRuth extends webServiceServer {
               array("from" => "Title", "to" => "itemDisplayTitle"),
               array("from" => "Amount", "to" => "fineAmount", "decimal" => TRUE),
               array("from" => "Payed", "to" => "fineAmountPaid"),
-              array("from" => "ServiceType", "to" => "fineType", "enum" => array("1" => "first recall", "2" => "second recall", "3" => "third recall", "d" => "d", "c" => "compensation", "p" => "penalty")),
+              array("from" => "ServiceType", "to" => "fineType", "enum" => array("1" => "first recall", "2" => "second recall", "3" => "third recall", "d" => "reservation", "r" => "reminder", "c" => "compensation", "p" => "penalty", "o" => "other")),
               array("from" => "InvoiceNo", "to" => "fineInvoiceNumber"));
             foreach ($dom->getElementsByTagName("Fines") as $fines)
               foreach ($fines->getElementsByTagName("Fine") as $fine)
@@ -1148,7 +1148,7 @@ class openRuth extends webServiceServer {
               array("from" => "CreationDate", "to" => "orderDate", "date" => "swap"),
               array("from" => "Arrived", "to" => "orderArrived", "bool" => "true"));
             foreach ($rsr->getElementsByTagName("ReservationReady") as $r)
-              $this->move_tags($r, $ord->ordersReady[]->_value, $trans);
+              $this->move_tags($r, $ord->orderReady[]->_value, $trans);
             $rsnr = &$reservations->getElementsByTagName("ReservationsNotReady")->item(0);
             $trans = array(
               array("from" => "Title", "to" => "itemDisplayTitle"),
@@ -1170,7 +1170,7 @@ class openRuth extends webServiceServer {
               array("from" => "DisposalType", "to" => "orderType", "enum" => array("0" => "booking", "1" => "reservation", "2" => "ILL")),
               array("from" => "ExpectedDelivery", "to" => "orderExpectedAvailabilityDate", "date" => "swap"));
             foreach ($rsnr->getElementsByTagName("ReservationNotReady") as $r)
-              $this->move_tags($r, $ord->ordersNotReady[]->_value, $trans);
+              $this->move_tags($r, $ord->orderNotReady[]->_value, $trans);
 
         // bookings
             $book = &$res->userStatus->_value->bookings->_value;
