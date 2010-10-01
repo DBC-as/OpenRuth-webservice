@@ -1071,6 +1071,29 @@
 			<xs:documentation xml:lang="en">User's last day of interest in an order</xs:documentation>
 		</xs:annotation>
 	</xs:element>
+	<xs:element name="orderNotReady">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">Details about an order that is not yet fullfilled/ready for pickup</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="or:itemDisplayTitle"/>
+				<xs:element ref="or:itemAuthor" minOccurs="0"/>
+				<xs:element ref="or:itemTitle" minOccurs="0"/>
+				<xs:element ref="or:itemPublicationYear" minOccurs="0"/>
+				<xs:element ref="or:itemSerialPartTitle" minOccurs="0"/>
+				<xs:element ref="or:agencyCounter"/>
+				<xs:element ref="or:orderId"/>
+				<xs:element ref="or:orderDate"/>
+				<xs:element ref="or:orderLastInterestDate"/>
+				<xs:element ref="or:orderPriority" minOccurs="0"/>
+				<xs:element ref="or:orderQueuePosition"/>
+				<xs:element ref="or:orderNote" minOccurs="0"/>
+				<xs:element ref="or:orderType"/>
+				<xs:element ref="or:orderExpectedAvailabilityDate" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
 	<xs:element name="orderNote" type="xs:string">
 		<xs:annotation>
 			<xs:documentation xml:lang="en">Note on an order</xs:documentation>
@@ -1101,50 +1124,6 @@
 			<xs:documentation xml:lang="en">Information about an user's position in the reservation queue for a given item</xs:documentation>
 		</xs:annotation>
 	</xs:element>
-	<xs:element name="orderType" type="or:orderTypeType">
-		<xs:annotation>
-			<xs:documentation xml:lang="en">Type of order</xs:documentation>
-		</xs:annotation>
-	</xs:element>
-	<xs:element name="orders">
-		<xs:annotation>
-			<xs:documentation xml:lang="en">Information about orders</xs:documentation>
-		</xs:annotation>
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element ref="or:orderReady" minOccurs="0" maxOccurs="unbounded"/>
-				<xs:element ref="or:orderNotReady" minOccurs="0" maxOccurs="unbounded"/>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="ordersCount" type="xs:integer">
-		<xs:annotation>
-			<xs:documentation xml:lang="en">Number of reservations on a given item</xs:documentation>
-		</xs:annotation>
-	</xs:element>
-	<xs:element name="orderNotReady">
-		<xs:annotation>
-			<xs:documentation xml:lang="en">Details about an order that is not yet fullfilled/ready for pickup</xs:documentation>
-		</xs:annotation>
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element ref="or:itemDisplayTitle"/>
-				<xs:element ref="or:itemAuthor" minOccurs="0"/>
-				<xs:element ref="or:itemTitle" minOccurs="0"/>
-				<xs:element ref="or:itemPublicationYear" minOccurs="0"/>
-				<xs:element ref="or:itemSerialPartTitle" minOccurs="0"/>
-				<xs:element ref="or:agencyCounter"/>
-				<xs:element ref="or:orderId"/>
-				<xs:element ref="or:orderDate"/>
-				<xs:element ref="or:orderLastInterestDate"/>
-				<xs:element ref="or:orderPriority" minOccurs="0"/>
-				<xs:element ref="or:orderQueuePosition"/>
-				<xs:element ref="or:orderNote" minOccurs="0"/>
-				<xs:element ref="or:orderType"/>
-				<xs:element ref="or:orderExpectedAvailabilityDate" minOccurs="0"/>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
 	<xs:element name="orderReady">
 		<xs:annotation>
 			<xs:documentation xml:lang="en">Details about an order that is fullfilled/ready for pickup</xs:documentation>
@@ -1165,6 +1144,27 @@
 				<xs:element ref="or:orderArrived"/>
 			</xs:sequence>
 		</xs:complexType>
+	</xs:element>
+	<xs:element name="orderType" type="or:orderTypeType">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">Type of order</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="orders">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">Information about orders</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="or:orderReady" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="or:orderNotReady" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ordersCount" type="xs:integer">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">Number of reservations on a given item</xs:documentation>
+		</xs:annotation>
 	</xs:element>
 	<xs:element name="outputType" type="or:outputTypeType">
 		<xs:annotation>
