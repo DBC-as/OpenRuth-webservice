@@ -292,13 +292,13 @@
 	</xs:element>
 	<xs:element name="userPaymentRequest">
 		<xs:annotation>
-			<xs:documentation xml:lang="en">The service request for paying user fines</xs:documentation>
+			<xs:documentation xml:lang="en">The service request for paying user fees</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:sequence>
 				<xs:element ref="or:agencyId"/>
 				<xs:element ref="or:userId"/>
-				<xs:element ref="or:fineAmountPaid"/>
+				<xs:element ref="or:feeAmountPaid"/>
 				<xs:element ref="or:userPaymentTransactionId" minOccurs="0"/>
 				<xs:element ref="or:callback" minOccurs="0"/>
 				<xs:element ref="or:outputType" minOccurs="0"/>
@@ -315,7 +315,7 @@
 	</xs:element>
 	<xs:element name="userStatusRequest">
 		<xs:annotation>
-			<xs:documentation xml:lang="en">The service reqeust for a user's status, includings loans, orders, ILLs and fines</xs:documentation>
+			<xs:documentation xml:lang="en">The service reqeust for a user's status, includings loans, orders, ILLs and fees</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:sequence>
@@ -659,54 +659,54 @@
 			<xs:documentation xml:lang="en">Unique identifier of a copy of an item</xs:documentation>
 		</xs:annotation>
 	</xs:element>
-	<xs:element name="fine">
+	<xs:element name="fee">
 		<xs:annotation>
-			<xs:documentation xml:lang="en">Details about a fine</xs:documentation>
+			<xs:documentation xml:lang="en">Details about a fee</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element ref="or:fineDate"/>
+				<xs:element ref="or:feeDate"/>
 				<xs:element ref="or:agencyCounter"/>
 				<xs:element ref="or:itemDisplayTitle"/>
-				<xs:element ref="or:fineAmount"/>
-				<xs:element ref="or:fineAmountPaid"/>
-				<xs:element ref="or:fineType"/>
-				<xs:element ref="or:fineInvoiceNumber"/>
+				<xs:element ref="or:feeAmount"/>
+				<xs:element ref="or:feeAmountPaid"/>
+				<xs:element ref="or:feeType"/>
+				<xs:element ref="or:feeInvoiceNumber"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
-	<xs:element name="fineAmount" type="xs:decimal">
+	<xs:element name="feeAmount" type="xs:decimal">
 		<xs:annotation>
-			<xs:documentation xml:lang="en">Amount of a fine</xs:documentation>
+			<xs:documentation xml:lang="en">Amount of a fee</xs:documentation>
 		</xs:annotation>
 	</xs:element>
-	<xs:element name="fineAmountPaid" type="xs:decimal">
+	<xs:element name="feeAmountPaid" type="xs:decimal">
 		<xs:annotation>
-			<xs:documentation xml:lang="en">Amount paid of a fine</xs:documentation>
+			<xs:documentation xml:lang="en">Amount paid of a fee</xs:documentation>
 		</xs:annotation>
 	</xs:element>
-	<xs:element name="fineDate" type="xs:date">
+	<xs:element name="feeDate" type="xs:date">
 		<xs:annotation>
-			<xs:documentation xml:lang="en">Date that a fine has been created in local system</xs:documentation>
+			<xs:documentation xml:lang="en">Date that a fee has been created in local system</xs:documentation>
 		</xs:annotation>
 	</xs:element>
-	<xs:element name="fineInvoiceNumber" type="xs:string">
+	<xs:element name="feeInvoiceNumber" type="xs:string">
 		<xs:annotation>
-			<xs:documentation xml:lang="en">Invoice number of a fine</xs:documentation>
+			<xs:documentation xml:lang="en">Invoice number of a fee</xs:documentation>
 		</xs:annotation>
 	</xs:element>
-	<xs:element name="fineType" type="or:fineTypeType">
+	<xs:element name="feeType" type="or:feeTypeType">
 		<xs:annotation>
-			<xs:documentation xml:lang="en">Type of fine</xs:documentation>
+			<xs:documentation xml:lang="en">Type of fee</xs:documentation>
 		</xs:annotation>
 	</xs:element>
-	<xs:element name="fines">
+	<xs:element name="fees">
 		<xs:annotation>
-			<xs:documentation xml:lang="en">Information about a user's fines</xs:documentation>
+			<xs:documentation xml:lang="en">Information about a user's fees</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element ref="or:fine" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="or:fee" minOccurs="0" maxOccurs="unbounded"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
@@ -1302,7 +1302,7 @@
 	</xs:element>
 	<xs:element name="userFeesTotal">
 		<xs:annotation>
-			<xs:documentation xml:lang="en">total amount of money that a user owes the library, including userFinesTotal</xs:documentation>
+			<xs:documentation xml:lang="en">total amount of money that a user owes the library</xs:documentation>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="userError" type="or:userErrorType">
@@ -1450,7 +1450,7 @@
 		<xs:complexType>
 			<xs:sequence>
 				<xs:element ref="or:userInfo"/>
-				<xs:element ref="or:fines"/>
+				<xs:element ref="or:fees"/>
 				<xs:element ref="or:loans"/>
 				<xs:element ref="or:orders"/>
 				<xs:element ref="or:bookings"/>
@@ -1523,7 +1523,7 @@
 			<xs:enumeration value="unknown agencyId"/>
 		</xs:restriction>
 	</xs:simpleType>
-	<xs:simpleType name="fineTypeType">
+	<xs:simpleType name="feeTypeType">
 		<xs:restriction base="xs:string">
 			<xs:enumeration value="compensation"/>
 			<xs:enumeration value="first recall"/>
