@@ -663,8 +663,9 @@ class openRuth extends webServiceServer {
               // order at least partly ok 
               foreach ($dom->getElementsByTagName("MRID") as $mrid) {
                 unset($ir);
-                $ir->orderItemId->_value = $mrid->getAttribute("Id");
-                //$ir->orderItemTitlePart->_value = $mrid->getAttribute("Tp");
+                $ir->orderItemId->_value->itemId->_value = $mrid->getAttribute("Id");
+                if ($mrid->getAttribute("Tp"))
+                  $ir->orderItemId->_value->itemSerialPartId->_value = $mrid->getAttribute("Tp");
                 if (!$mrid->nodeValue)
                   $ir->orderItemOk->_value = "true";
                 elseif (!($ir->orderItemError->_value = $this->errs[$mrid->nodeValue])) 
