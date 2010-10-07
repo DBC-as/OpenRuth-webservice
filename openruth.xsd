@@ -1300,7 +1300,7 @@
 			<xs:documentation xml:lang="en">User's e-mail adress</xs:documentation>
 		</xs:annotation>
 	</xs:element>
-	<xs:element name="userFeesTotal">
+	<xs:element name="userFeesTotal" type="xs:decimal">
 		<xs:annotation>
 			<xs:documentation xml:lang="en">total amount of money that a user owes the library</xs:documentation>
 		</xs:annotation>

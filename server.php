@@ -1074,7 +1074,7 @@ class openRuth extends webServiceServer {
               array("from" => "StandardCounter", "to" => "agencyCounter"),
               array("from" => "ReservationAllowed", "to" => "userOrderAllowed", "bool" => "y"),
               array("from" => "BookingAllowed", "to" => "userBookingAllowed", "bool" => "y"),
-              array("from" => "Penalties", "to" => "userFeesTotal"),
+              array("from" => "Penalties", "to" => "userFeesTotal", "decimal" => TRUE),
               array("from" => "MobilePhone", "to" => "userMobilePhone"),
               array("from" => "Journal", "to" => "userNote"),
               array("from" => "JournalDate", "to" => "userNoteDate", "date" => "swap"),
@@ -1082,18 +1082,18 @@ class openRuth extends webServiceServer {
             $this->move_tags($loaner, $ui, $trans);
 
         // fines
-            $fi = &$res->userStatus->_value->fines->_value;
+            $fi = &$res->userStatus->_value->fees->_value;
             $trans = array(
-              array("from" => "ServiceDate", "to" => "fineDate", "date" => "swap"),
+              array("from" => "ServiceDate", "to" => "feeDate", "date" => "swap"),
               array("from" => "ServiceCounter", "to" => "agencyCounter"),
               array("from" => "Title", "to" => "itemDisplayTitle"),
-              array("from" => "Amount", "to" => "fineAmount", "decimal" => TRUE),
-              array("from" => "Payed", "to" => "fineAmountPaid"),
-              array("from" => "ServiceType", "to" => "fineType", "enum" => array("1" => "first recall", "2" => "second recall", "3" => "third recall", "d" => "reservation", "r" => "reminder", "c" => "compensation", "p" => "penalty", "o" => "other")),
-              array("from" => "InvoiceNo", "to" => "fineInvoiceNumber"));
+              array("from" => "Amount", "to" => "feeAmount", "decimal" => TRUE),
+              array("from" => "Payed", "to" => "feeAmountPaid"),
+              array("from" => "ServiceType", "to" => "feeType", "enum" => array("1" => "first recall", "2" => "second recall", "3" => "third recall", "d" => "reservation", "r" => "reminder", "c" => "compensation", "p" => "penalty", "o" => "other")),
+              array("from" => "InvoiceNo", "to" => "feeInvoiceNumber"));
             foreach ($dom->getElementsByTagName("Fines") as $fines)
               foreach ($fines->getElementsByTagName("Fine") as $fine)
-                $this->move_tags($fine, $fi->fine[]->_value, $trans);
+                $this->move_tags($fine, $fi->fee[]->_value, $trans);
             
 
         // loans
