@@ -671,7 +671,7 @@
 				<xs:element ref="or:feeAmount"/>
 				<xs:element ref="or:feeAmountPaid"/>
 				<xs:element ref="or:feeType"/>
-				<xs:element ref="or:feeInvoiceNumber"/>
+				<xs:element ref="or:feeInvoiceNumber" minOccurs="0"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
