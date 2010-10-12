@@ -292,7 +292,7 @@
 	</xs:element>
 	<xs:element name="userPaymentRequest">
 		<xs:annotation>
-			<xs:documentation xml:lang="en">The service request for paying user fees</xs:documentation>
+			<xs:documentation xml:lang="en">The service request for paying user fees. Only fees with a feeInvoiceNumber can be paid through Open Ruth. feeAmountPaid has to match userFeesTotal.</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:sequence>
@@ -702,7 +702,7 @@
 	</xs:element>
 	<xs:element name="fees">
 		<xs:annotation>
-			<xs:documentation xml:lang="en">Information about a user's fees</xs:documentation>
+			<xs:documentation xml:lang="en">Information about a user's fees. Fees with a feeInvoiceNumber cannot be paid through Open Ruth. Several instances of a fee can share the same feeInvoiceNumber. </xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:sequence>
@@ -1302,7 +1302,7 @@
 	</xs:element>
 	<xs:element name="userFeesTotal" type="xs:decimal">
 		<xs:annotation>
-			<xs:documentation xml:lang="en">total amount of money that a user owes the library</xs:documentation>
+			<xs:documentation xml:lang="en">amount of money that a user owes the library. NB! Only included fees without a feeInvoiceNumber</xs:documentation>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="userError" type="or:userErrorType">
