@@ -251,7 +251,7 @@
 				<xs:element ref="or:userPinCodeNew" minOccurs="0"/>
 				<xs:element ref="or:userEmail" minOccurs="0"/>
 				<xs:element ref="or:userMobilePhone" minOccurs="0"/>
-				<xs:element ref="or:userPreReturnReminder" minOccurs="0"/>
+				<xs:element ref="or:userNotificationPreference" minOccurs="0"/>
 				<xs:element ref="or:userFirstName" minOccurs="0"/>
 				<xs:element ref="or:userLastName" minOccurs="0"/>
 				<xs:element ref="or:agencyCounter" minOccurs="0"/>
@@ -1393,6 +1393,11 @@
 			<xs:documentation xml:lang="en">Text of a note</xs:documentation>
 		</xs:annotation>
 	</xs:element>
+	<xs:element name="userNotificationPreference" type="or:userPreReturnReminderType">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">How the user wants to recieve info about loans shortly due, orders ready and recall messages (if empty preference is snail mail).</xs:documentation>
+		</xs:annotation>
+	</xs:element>
 	<xs:element name="userPaymentError" type="or:userPaymentErrorType">
 		<xs:annotation>
 			<xs:documentation xml:lang="en">Error messages related to userPaymentRequest</xs:documentation>
@@ -1425,12 +1430,7 @@
 	</xs:element>
 	<xs:element name="userPostCode" type="xs:string">
 		<xs:annotation>
-			<xs:documentation xml:lang="en">User's post code</xs:documentation>
-		</xs:annotation>
-	</xs:element>
-	<xs:element name="userPreReturnReminder" type="or:userPreReturnReminderType">
-		<xs:annotation>
-			<xs:documentation xml:lang="en">How the user wants to be notified about loans shortly due</xs:documentation>
+			<xs:documentation xml:lang="en">User's zip code</xs:documentation>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="userOrderAllowed" type="xs:boolean">
