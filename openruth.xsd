@@ -1393,7 +1393,7 @@
 			<xs:documentation xml:lang="en">Text of a note</xs:documentation>
 		</xs:annotation>
 	</xs:element>
-	<xs:element name="userNotificationPreference" type="or:userPreReturnReminderType">
+	<xs:element name="userNotificationPreference" type="or:userNotificationPreferenceType">
 		<xs:annotation>
 			<xs:documentation xml:lang="en">How the user wants to recieve info about loans shortly due, orders ready and recall messages (if empty preference is snail mail).</xs:documentation>
 		</xs:annotation>
@@ -1660,20 +1660,19 @@
 			<xs:enumeration value="wrong pin code"/>
 		</xs:restriction>
 	</xs:simpleType>
+	<xs:simpleType name="userNotificationPreferenceType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="sms"/>
+			<xs:enumeration value="email"/>
+			<xs:enumeration value="both"/>
+		</xs:restriction>
+	</xs:simpleType>
 	<xs:simpleType name="userPaymentErrorType">
 		<xs:restriction base="xs:string">
 			<xs:enumeration value="unknown agencyId"/>
 			<xs:enumeration value="unknown userId"/>
 			<xs:enumeration value="amount is not the exact amount"/>
 			<xs:enumeration value="system error"/>
-		</xs:restriction>
-	</xs:simpleType>
-	<xs:simpleType name="userPreReturnReminderType">
-		<xs:restriction base="xs:string">
-			<xs:enumeration value="sms"/>
-			<xs:enumeration value="email"/>
-			<xs:enumeration value="both"/>
-			<xs:enumeration value="none"/>
 		</xs:restriction>
 	</xs:simpleType>
 	<xs:simpleType name="userSexType">
