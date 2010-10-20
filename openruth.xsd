@@ -251,7 +251,8 @@
 				<xs:element ref="or:userPinCodeNew" minOccurs="0"/>
 				<xs:element ref="or:userEmail" minOccurs="0"/>
 				<xs:element ref="or:userMobilePhone" minOccurs="0"/>
-				<xs:element ref="or:userNotificationPreference" minOccurs="0"/>
+				<xs:element ref="or:userRecallNotificationPreference" minOccurs="0"/>
+				<xs:element ref="or:userOrderReadyNotificationPreference" minOccurs="0"/>
 				<xs:element ref="or:userFirstName" minOccurs="0"/>
 				<xs:element ref="or:userLastName" minOccurs="0"/>
 				<xs:element ref="or:agencyCounter" minOccurs="0"/>
@@ -1354,6 +1355,8 @@
 				<xs:element ref="or:userFeesTotal"/>
 				<xs:element ref="or:userMobilePhone" minOccurs="0"/>
 				<xs:element ref="or:userNote" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="or:userRecallNotificationPreference" minOccurs="0"/>
+				<xs:element ref="or:userOrderReadyNotificationPreference" minOccurs="0"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
@@ -1393,9 +1396,14 @@
 			<xs:documentation xml:lang="en">Text of a note</xs:documentation>
 		</xs:annotation>
 	</xs:element>
-	<xs:element name="userNotificationPreference" type="or:userNotificationPreferenceType">
+	<xs:element name="userOrderAllowed" type="xs:boolean">
 		<xs:annotation>
-			<xs:documentation xml:lang="en">How the user wants to recieve info about loans shortly due, orders ready and recall messages (if empty preference is snail mail).</xs:documentation>
+			<xs:documentation xml:lang="en">Boolean indicating whether user is allowed to reserve materials in local system</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="userOrderReadyNotificationPreference" type="or:userOrderReadyNotificationPreferenceType">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">How the user wants to recieve notification when an orders is ready for pick up (if empty preference is snail mail).</xs:documentation>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="userPaymentError" type="or:userPaymentErrorType">
@@ -1433,9 +1441,9 @@
 			<xs:documentation xml:lang="en">User's zip code</xs:documentation>
 		</xs:annotation>
 	</xs:element>
-	<xs:element name="userOrderAllowed" type="xs:boolean">
+	<xs:element name="userRecallNotificationPreference" type="or:userRecallNotificationPreferenceType">
 		<xs:annotation>
-			<xs:documentation xml:lang="en">Boolean indicating whether user is allowed to reserve materials in local system</xs:documentation>
+			<xs:documentation xml:lang="en">How the user wants to recieve reminders about loans shortly due and and recall messages (if empty preference is snail mail).</xs:documentation>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="userSex" type="or:userSexType">
@@ -1660,7 +1668,7 @@
 			<xs:enumeration value="wrong pin code"/>
 		</xs:restriction>
 	</xs:simpleType>
-	<xs:simpleType name="userNotificationPreferenceType">
+	<xs:simpleType name="userOrderReadyNotificationPreferenceType">
 		<xs:restriction base="xs:string">
 			<xs:enumeration value="sms"/>
 			<xs:enumeration value="email"/>
@@ -1673,6 +1681,13 @@
 			<xs:enumeration value="unknown userId"/>
 			<xs:enumeration value="amount is not the exact amount"/>
 			<xs:enumeration value="system error"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="userRecallNotificationPreferenceType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="sms"/>
+			<xs:enumeration value="email"/>
+			<xs:enumeration value="both"/>
 		</xs:restriction>
 	</xs:simpleType>
 	<xs:simpleType name="userSexType">
