@@ -1403,7 +1403,7 @@
 	</xs:element>
 	<xs:element name="userOrderReadyNotificationPreference" type="or:userOrderReadyNotificationPreferenceType">
 		<xs:annotation>
-			<xs:documentation xml:lang="en">How the user wants to recieve notification when an orders is ready for pick up (if empty preference is snail mail).</xs:documentation>
+			<xs:documentation xml:lang="en">How the user wants to recieve notification when an order is ready for pick up (if "other" preference will for instance be snail mail).</xs:documentation>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="userPaymentError" type="or:userPaymentErrorType">
@@ -1418,7 +1418,7 @@
 	</xs:element>
 	<xs:element name="userPaymentTransactionId" type="xs:string">
 		<xs:annotation>
-			<xs:documentation>TransactionId from DIBS (to identify payment)</xs:documentation>
+			<xs:documentation xml:lang="en">TransactionId from DIBS (to identify payment)</xs:documentation>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="userPinCode" type="xs:string">
@@ -1443,7 +1443,7 @@
 	</xs:element>
 	<xs:element name="userRecallNotificationPreference" type="or:userRecallNotificationPreferenceType">
 		<xs:annotation>
-			<xs:documentation xml:lang="en">How the user wants to recieve reminders about loans shortly due and and recall messages (if empty preference is snail mail).</xs:documentation>
+			<xs:documentation xml:lang="en">How the user wants to recieve reminders about loans shortly due and recall messages (if "other" preference is typically snail mail and to reminder will be sent).</xs:documentation>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="userSex" type="or:userSexType">
@@ -1673,6 +1673,7 @@
 			<xs:enumeration value="sms"/>
 			<xs:enumeration value="email"/>
 			<xs:enumeration value="both"/>
+			<xs:enumeration value="other"/>
 		</xs:restriction>
 	</xs:simpleType>
 	<xs:simpleType name="userPaymentErrorType">
@@ -1688,6 +1689,7 @@
 			<xs:enumeration value="sms"/>
 			<xs:enumeration value="email"/>
 			<xs:enumeration value="both"/>
+			<xs:enumeration value="other"/>
 		</xs:restriction>
 	</xs:simpleType>
 	<xs:simpleType name="userSexType">
