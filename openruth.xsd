@@ -1673,7 +1673,7 @@
 			<xs:enumeration value="sms"/>
 			<xs:enumeration value="email"/>
 			<xs:enumeration value="both"/>
-			<xs:enumeration value="other"/>
+			<xs:enumeration value=""/>
 		</xs:restriction>
 	</xs:simpleType>
 	<xs:simpleType name="userPaymentErrorType">
@@ -1689,7 +1689,7 @@
 			<xs:enumeration value="sms"/>
 			<xs:enumeration value="email"/>
 			<xs:enumeration value="both"/>
-			<xs:enumeration value="other"/>
+			<xs:enumeration value=""/>
 		</xs:restriction>
 	</xs:simpleType>
 	<xs:simpleType name="userSexType">
