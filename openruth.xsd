@@ -1372,7 +1372,7 @@
 	</xs:element>
 	<xs:element name="userMobilePhone" type="xs:integer">
 		<xs:annotation>
-			<xs:documentation xml:lang="en">User's mobile phone number</xs:documentation>
+			<xs:documentation xml:lang="en">User's mobile phone number.</xs:documentation>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="userNote">
@@ -1403,7 +1403,7 @@
 	</xs:element>
 	<xs:element name="userOrderReadyNotificationPreference" type="or:userOrderReadyNotificationPreferenceType">
 		<xs:annotation>
-			<xs:documentation xml:lang="en">How the user wants to recieve notification when an order is ready for pick up (if "other" preference will for instance be snail mail).</xs:documentation>
+			<xs:documentation xml:lang="en">How the user wants to receive notification when an order is ready for pick up. If set to "other" in updateUserInfoRequest, element will not be present in userStatusResponse. What values element can be set to with updateUserInfoRequest, depends on whether userMobilePhone and userEmail are set (eg. element can not be set to sms if userMobilePhone is not set). When userMobilePhone or userEmail are changed and element is not present in updateUserInfoRequest, it's value can be automatically changed to reflect these changes.</xs:documentation>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="userPaymentError" type="or:userPaymentErrorType">
@@ -1443,7 +1443,7 @@
 	</xs:element>
 	<xs:element name="userRecallNotificationPreference" type="or:userRecallNotificationPreferenceType">
 		<xs:annotation>
-			<xs:documentation xml:lang="en">How the user wants to recieve reminders about loans shortly due and recall messages (if "other" preference is typically snail mail and to reminder will be sent).</xs:documentation>
+			<xs:documentation xml:lang="en">How the user wants to receive reminders about loans shortly due and recall messages. If set to "other" in updateUserInfoRequest, element will not be present in userStatusResponse. What values element can be set to with updateUserInfoRequest, depends on whether userMobilePhone and userEmail are set (eg. element can not be set to sms if userMobilePhone is not set). When userMobilePhone or userEmail are changed and element is not present in updateUserInfoRequest, it's value can be automatically changed to reflect these changes.</xs:documentation>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="userSex" type="or:userSexType">
@@ -1673,7 +1673,7 @@
 			<xs:enumeration value="sms"/>
 			<xs:enumeration value="email"/>
 			<xs:enumeration value="both"/>
-			<xs:enumeration value=""/>
+			<xs:enumeration value="other"/>
 		</xs:restriction>
 	</xs:simpleType>
 	<xs:simpleType name="userPaymentErrorType">
@@ -1689,7 +1689,7 @@
 			<xs:enumeration value="sms"/>
 			<xs:enumeration value="email"/>
 			<xs:enumeration value="both"/>
-			<xs:enumeration value=""/>
+			<xs:enumeration value="other"/>
 		</xs:restriction>
 	</xs:simpleType>
 	<xs:simpleType name="userSexType">
