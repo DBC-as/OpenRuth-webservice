@@ -369,7 +369,7 @@ class openRuth extends webServiceServer {
         $book->ServiceCounter->_value = $param->agencyCounter->_value;
         $book->MRID->_value->ID->_value = $param->itemId->_value;
         $book->MRID->_value->TitlePartNo->_value = ($param->itemSerialPartId->_value ? $param->itemSerialPartId->_value : 0);
-        $xml = '<?xml version="1.0" encoding="UTF-8" ?'.'>' . $this->objconvert->obj2xml($booking);
+        $xml = '<?xml version="1.0" encoding="ISO-8859-1" ?'.'>' . utf8_decode($this->objconvert->obj2xml($booking));
         $z = new z3950();
         $z->set_target($tgt["host"]);
         $z->set_database($tgt["database"]."-ophelia");
@@ -439,7 +439,7 @@ class openRuth extends webServiceServer {
         $book->EndDate->_value = $this->to_zruth_date($param->bookingEndDate->_value);
         $book->NumberOrdered->_value = $param->bookingTotalCount->_value;
         $book->ServiceCounter->_value = $param->agencyCounter->_value;
-        $xml = '<?xml version="1.0" encoding="UTF-8" ?'.'>' . $this->objconvert->obj2xml($booking);
+        $xml = '<?xml version="1.0" encoding="ISO-8859-1" ?'.'>' . utf8_decode($this->objconvert->obj2xml($booking));
         $z = new z3950();
         $z->set_target($tgt["host"]);
         $z->set_database($tgt["database"]."-ophelia");
@@ -504,7 +504,7 @@ class openRuth extends webServiceServer {
         $book = &$booking->BookingDelete->_value;
         $book->LibraryNo->_value = $agencyId;
         $book->DisposalID->_value = $param->bookingId->_value;
-        $xml = '<?xml version="1.0" encoding="UTF-8" ?'.'>' . $this->objconvert->obj2xml($booking);
+        $xml = '<?xml version="1.0" encoding="ISO-8859-1" ?'.'>' . utf8_decode($this->objconvert->obj2xml($booking));
         $z = new z3950();
         $z->set_target($tgt["host"]);
         $z->set_database($tgt["database"]."-ophelia");
@@ -566,7 +566,7 @@ class openRuth extends webServiceServer {
         $ord = &$order->ReservationDelete->_value;
         $ord->LibraryNo->_value = $agencyId;
         $ord->DisposalID->_value = $param->orderId->_value;
-        $xml = '<?xml version="1.0" encoding="UTF-8" ?'.'>' . $this->objconvert->obj2xml($order);
+        $xml = '<?xml version="1.0" encoding="ISO-8859-1" ?'.'>' . utf8_decode($this->objconvert->obj2xml($order));
         $z = new z3950();
         $z->set_target($tgt["host"]);
         $z->set_database($tgt["database"]."-ophelia");
@@ -641,7 +641,7 @@ class openRuth extends webServiceServer {
             $mrid->TitlePartNo->_value = 0;
           $ord->MRIDS->_value->MRID->_value = $mrid;
         }
-        $xml = '<?xml version="1.0" encoding="UTF-8" ?'.'>' . $this->objconvert->obj2xml($order);
+        $xml = '<?xml version="1.0" encoding="ISO-8859-1" ?'.'>' . utf8_decode($this->objconvert->obj2xml($order));
         
 //print_r($ord);
 //print_r($xml);
@@ -709,7 +709,7 @@ class openRuth extends webServiceServer {
         $ord->DisposalNote->_value = $param->orderNote->_value;
         $ord->LastUseDate->_value = $this->to_zruth_date($param->orderLastInterestDate->_value);
         $ord->ServiceCounter->_value = $param->agencyCounter->_value;
-        $xml = '<?xml version="1.0" encoding="UTF-8" ?'.'>' . $this->objconvert->obj2xml($order);
+        $xml = '<?xml version="1.0" encoding="ISO-8859-1" ?'.'>' . utf8_decode($this->objconvert->obj2xml($order));
         $z = new z3950();
         $z->set_target($tgt["host"]);
         $z->set_database($tgt["database"]."-ophelia");
@@ -779,7 +779,7 @@ class openRuth extends webServiceServer {
             $renewal->CopyNos->_value->CopyNo[]->_value = $copyId->_value;
         else
           $renewal->CopyNos->_value->CopyNo->_value = $param->copyId->_value;
-        $xml = '<?xml version="1.0" encoding="UTF-8" ?'.'>' . $this->objconvert->obj2xml($renew);
+        $xml = '<?xml version="1.0" encoding="ISO-8859-1" ?'.'>' . utf8_decode($this->objconvert->obj2xml($renew));
         $z = new z3950();
         $z->set_target($tgt["host"]);
         $z->set_database($tgt["database"]."-ophelia");
@@ -827,7 +827,8 @@ class openRuth extends webServiceServer {
   /** \brief 
    *
    * @param $param agencyId, userId, userPinCode, userPinCodeNew, userEmail, userMobilePhone, 
-   *               userPreReturnReminder, userFirstName, userLastName, agencyCounter
+   *               userRecallNotificationPreference, userOrderReadyNotificationPreference,
+   *               userFirstName, userLastName, agencyCounter
    * @return
    *
    */
@@ -843,17 +844,19 @@ class openRuth extends webServiceServer {
         $bor->BorrowerTicketNo->_value = $param->userId->_value;
         $bor->OldPinCode->_value = $param->userPinCode->_value;
         if ($param->userPinCodeNew->_value) $bor->NewPinCode->_value = $param->userPinCodeNew->_value;
-        if ($param->userEmail->_value) $bor->Email->_value = $param->userEmail->_value;
-        if ($param->userMobilePhone->_value) $bor->MobilePhone->_value = $param->userMobilePhone->_value;
-        if ($param->userPreReturnReminder->_value)
-          if (in_array($param->userPreReturnReminder->_value, array("sms", "email", "both")))
-            $bor->UsePreReturnMsg->_value = $param->userPreReturnReminder->_value;
-          else
-            $bor->UsePreReturnMsg->_value = "none";
+        if ($param->userEmail) $bor->Email->_value = $param->userEmail->_value;
+        if ($param->userMobilePhone) $bor->MobilePhone->_value = $param->userMobilePhone->_value;
+        $notifications = array("sms" => "s", "email" => "e", "both" => "b");
+        if ($param->userRecallNotificationPreference->_value)
+          if (!($bor->UsePreReturnMsg->_value = $notifications[$param->userRecallNotificationPreference->_value]))
+            $bor->UsePreReturnMsg->_value = "other";
+        if ($param->userOrderReadyNotificationPreference->_value)
+          if (!($bor->UseCopyRetainedMsg->_value = $notifications[$param->userOrderReadyNotificationPreference->_value]))
+            $bor->UseCopyRetainedMsg->_value = "other";
         if ($param->userFirstName->_value) $bor->FirstName->_value = $param->userFirstName->_value;
         if ($param->userLastName->_value) $bor->FamilyName->_value = $param->userLastName->_value;
         if ($param->agencyCounter->_value) $bor->StandardCounter->_value = $param->agencyCounter->_value;
-        $xml = '<?xml version="1.0" encoding="UTF-8" ?'.'>' . $this->objconvert->obj2xml($borrower);
+        $xml = '<?xml version="1.0" encoding="ISO-8859-1" ?'.'>' . utf8_decode($this->objconvert->obj2xml($borrower));
         $z = new z3950();
         $z->set_target($tgt["host"]);
         $z->set_database($tgt["database"]."-ophelia");
@@ -981,7 +984,7 @@ class openRuth extends webServiceServer {
         $pay->BorrowerTicketNo->_value = $param->userId->_value;
         $pay->Amount->_value = $param->fineAmountPaid->_value;
         $pay->TransactionID->_value = $param->userPaymentTransactionId->_value;
-        $xml = '<?xml version="1.0" encoding="UTF-8" ?'.'>' . $this->objconvert->obj2xml($payment);
+        $xml = '<?xml version="1.0" encoding="ISO-8859-1" ?'.'>' . utf8_decode($this->objconvert->obj2xml($payment));
         $z = new z3950();
         $z->set_target($tgt["host"]);
         $z->set_database($tgt["database"]."-ophelia");
@@ -1075,10 +1078,19 @@ class openRuth extends webServiceServer {
               array("from" => "ReservationAllowed", "to" => "userOrderAllowed", "bool" => "y"),
               array("from" => "BookingAllowed", "to" => "userBookingAllowed", "bool" => "y"),
               array("from" => "Penalties", "to" => "userFeesTotal", "decimal" => TRUE),
-              array("from" => "MobilePhone", "to" => "userMobilePhone"),
-              array("from" => "Journal", "to" => "userNote"),
+              array("from" => "MobilePhone", "to" => "userMobilePhone"));
+            $this->move_tags($loaner, $ui, $trans);
+          // journals maps into userInfo
+            $trans = array(
               array("from" => "JournalDate", "to" => "userNoteDate", "date" => "swap"),
-              array("from" => "JournalTxt", "to" => "userNoteTxt"));
+              array("from" => "JournalTxt", "to" => "userNoteText"));
+            foreach ($dom->getElementsByTagName("Journals") as $journals)
+              foreach ($journals->getElementsByTagName("Journal") as $journal)
+                $this->move_tags($journal, $ui->userNote[]->_value, $trans);
+          // ... and the rest ...
+            $trans = array(
+              array("from" => "UsePreReturnMsg", "to" => "userRecallNotificationPreference", "enum" => array("e" => "email", "s" => "sms", "b" => "both")),
+              array("from" => "UseCopyRetainedMsg", "to" => "userOrderReadyNotificationPreference", "enum" => array("e" => "email", "s" => "sms", "b" => "both")));
             $this->move_tags($loaner, $ui, $trans);
 
         // fines
@@ -1190,9 +1202,9 @@ class openRuth extends webServiceServer {
                                       "Afsluttet" => "closed", 
                                       "Fanget" => "retained", 
                                       "Restordre" => "back order", 
-                                      "Udlånt" => "on loan", 
+                                      "UdlÃ¥nt" => "on loan", 
                                       "Delvis afleveret" => "partly returned", 
-                                      "Delvis udlånt" => "partly on loan", 
+                                      "Delvis udlÃ¥nt" => "partly on loan", 
                                       "Delvis fanget" => "partly retained", 
                                       "Aktiv" => "active", 
                                       "Registreret" => "registered")),
@@ -1213,15 +1225,15 @@ class openRuth extends webServiceServer {
               array("from" => "LoanLendingLibrary", "to" => "illProviderAgencyId"),
               array("from" => "ILLStatus", "to" => "illStatus", 
                       "enum" => array("Ny" => "new", 
-                                      "Låner ukendt" => "unknown user", 
-                                      "Långiver ukendt" => "unknown provider agency", 
+                                      "LÃ¥ner ukendt" => "unknown user", 
+                                      "LÃ¥ngiver ukendt" => "unknown provider agency", 
                                       "Oprettet" => "created", 
                                       "Bestilt" => "ordered", 
                                       "Kan ikke leveres" => "can not be delivered", 
                                       "Rykket" => "dunned", 
                                       "Modtaget" => "recieved", 
-                                      "Udlånt" => "on loan", 
-                                      "Ønskes fornyet" => "renewal wanted", 
+                                      "UdlÃ¥nt" => "on loan", 
+                                      "Ã˜nskes fornyet" => "renewal wanted", 
                                       "Forespurgt forny" => "renewal requested", 
                                       "Kan ikke fornys" => "can not be renewed", 
                                       "Fornyet" => "renewed", 
@@ -1277,12 +1289,16 @@ class openRuth extends webServiceServer {
    * @return - called as procedure
    */
   private function move_tags(&$from, &$to, &$tags) {
+//echo "from: " . var_export($from, TRUE) . " <br/>\n";
+//echo "to: " . var_export($to, TRUE) . " <br/>\n";
+//echo "tags: " . var_export($tags, TRUE) . " <br/>\n";
     foreach ($tags as $tag) 
       foreach ($from->getElementsByTagName($tag["from"]) as $node) {
         if ($tag["from_attr"])
           $node_val = $node->getAttribute($tag["from_attr"]);
         else
           $node_val = $node->nodeValue;
+//echo "nodeval: $node_val <br/>\n";
         if ($tag["bool"])
           $to->{$tag["to"]}[]->_value = ($node_val == $tag["bool"] ? "true" : "false");
         elseif ($tag["enum"] && isset($tag["enum"][$node_val]))
