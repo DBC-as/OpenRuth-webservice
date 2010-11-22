@@ -1,7 +1,7 @@
 ; Inifile for openruth
 
 [setup]
-version = 0.3
+version = 0.4
 
 ; wsdl for service
 wsdl = openruth.wsdl
@@ -121,7 +121,6 @@ action[agencyCounters][] = callback
 action[agencyCounters][] = outputType
 
 action[holdings][] = agencyId
-action[holdings][] = showCompingCopies
 action[holdings][] = itemId
 action[holdings][] = callback
 action[holdings][] = outputType
@@ -133,6 +132,7 @@ action[bookingInfo][] = bookingId
 action[bookingInfo][] = callback
 action[bookingInfo][] = outputType
 
+action[bookItem][] = agencyId
 action[bookItem][] = userId
 action[bookItem][] = agencyCounter
 action[bookItem][] = bookingNote
@@ -144,6 +144,7 @@ action[bookItem][] = serialPartId
 action[bookItem][] = callback
 action[bookItem][] = outputType
 
+action[updateBooking][] = agencyId
 action[updateBooking][] = bookingId
 action[updateBooking][] = agencyCounter
 action[updateBooking][] = bookingNote
@@ -153,6 +154,7 @@ action[updateBooking][] = bookingsCount
 action[updateBooking][] = callback
 action[updateBooking][] = outputType
 
+action[cancelBooking][] = agencyId
 action[cancelBooking][] = bookingId
 action[cancelBooking][] = callback
 action[cancelBooking][] = outputType
@@ -193,7 +195,7 @@ action[renewLoan][] = outputType
 
 action[updateUserInfo][] = agencyId
 action[updateUserInfo][] = userId
-action[updateUserInfo][] = userPinCodeOld
+action[updateUserInfo][] = userPinCode
 action[updateUserInfo][] = userPinCodeNew
 action[updateUserInfo][] = userEmail
 action[updateUserInfo][] = userMobilePhone
