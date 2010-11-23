@@ -226,8 +226,8 @@ class openRuth extends webServiceServer {
                           array("from" => "MMCOLLECTION", "from_attr" => "CODE", "to" => "agencyCollectionName"));
                         $this->move_tags($location, $res_loc->agencyCollectionId->_value, $trans);
                         $trans = array(
-                          array("from" => "BRANCH", "to" => "agencyBranchCode"),
-                          array("from" => "BRANCH", "from_attr" => "CODE", "to" => "agencyBranchName"));
+                          array("from" => "BRANCH", "from_attr" => "CODE", "to" => "agencyBranchCode"),
+                          array("from" => "BRANCH", "to" => "agencyBranchName"));
                         $this->move_tags($location, $res_loc->agencyBranchId->_value, $trans);
                         $trans = array(
                           array("from" => "DEPARTMENT", "to" => "agencyDepartmentCode"),
