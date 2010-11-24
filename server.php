@@ -184,7 +184,7 @@ class openRuth extends webServiceServer {
             $this->watch->start("zrecord");
             $holdings = $z->z3950_record(1);
             $this->watch->stop("zrecord");
-//echo "holdings: /" . $holdings . "/\n";
+//echo "holdings: /" . $holdings . "/\n"; die();
             $dom = new DomDocument();
             $dom->preserveWhiteSpace = false;
             if ($dom->loadXML($holdings)) {
@@ -210,40 +210,42 @@ class openRuth extends webServiceServer {
                         array("from" => "BOOKINGS", "to" => "bookingsCount"),
                         array("from" => "EXPECTEDDISPATCHDATE", "to" => "itemExpectedAvailabilityDate", "date" => "swap"));
                       $this->move_tags($peri, $res_item->_value, $trans);
-                      //if ($peri->getElementsByTagName("LOCATION")->item(0)) echo "LOCATION";
-                      //if ($peri->getElementsByTagName("LOCATIONCOMMING")->item(0)) echo "LOCATIONCOMMING";
-                      if ($location = $peri->getElementsByTagName("LOCATION")->item(0))
-                        $res_loc = &$res_item->_value->itemLocation->_value;
-                      elseif ($location = $peri->getElementsByTagName("LOCATIONCOMMING")->item(0))
-                        $res_loc = &$res_item->_value->itemComingLocation->_value;
                       if (isset($res_item)) {
-                        $trans = array(
-                          array("from" => "MMCOLLECTION", "from_attr" => "BOOKINGALLOWED", "to" => "bookingAllowed", "bool" => "y"),
-                          array("from" => "MMCOLLECTION", "from_attr" => "RESERVATIONALLOWED", "to" => "orderAllowed", "bool" => "y"));
-                        $this->move_tags($location, $res_loc, $trans);
-                        $trans = array(
-                          array("from" => "MMCOLLECTION", "to" => "agencyCollectionCode"),
-                          array("from" => "MMCOLLECTION", "from_attr" => "CODE", "to" => "agencyCollectionName"));
-                        $this->move_tags($location, $res_loc->agencyCollectionId->_value, $trans);
-                        $trans = array(
-                          array("from" => "BRANCH", "from_attr" => "CODE", "to" => "agencyBranchCode"),
-                          array("from" => "BRANCH", "to" => "agencyBranchName"));
-                        $this->move_tags($location, $res_loc->agencyBranchId->_value, $trans);
-                        $trans = array(
-                          array("from" => "DEPARTMENT", "to" => "agencyDepartmentCode"),
-                          array("from" => "DEPARTMENT", "from_attr" => "CODE", "to" => "agencyDepartmentName"));
-                        $this->move_tags($location, $res_loc->agencyDepartmentId->_value, $trans);
-                        $trans = array(
-                          array("from" => "PLACEMENT", "to" => "agencyPlacementCode"),
-                          array("from" => "PLACEMENT", "from_attr" => "CODE", "to" => "agencyPlacementName"));
-                        $this->move_tags($location, $res_loc->agencyPlacementId->_value, $trans);
-                        $trans = array(
-                          array("from" => "HOME", "to" => "copiesAvailableCount"),
-                          array("from" => "TOTAL", "to" => "copiesCount"),
-                          array("from" => "DELIVERYDATE", "to" => "itemExpectedDeliveryDate", "date" => "swap"));
-                        $this->move_tags($location, $res_loc, $trans);
+                        foreach ($peri->childNodes as $location) {
+                          if ($location->tagName == "LOCATION")
+                            $res_loc = &$res_item->_value->itemLocation[]->_value;
+                          elseif ($location->tagName == "LOCATIONCOMMING")
+                            $res_loc = &$res_item->_value->itemComingLocation[]->_value;
+                          else
+                            continue;
+                          $trans = array(
+                            array("from" => "MMCOLLECTION", "from_attr" => "BOOKINGALLOWED", "to" => "bookingAllowed", "bool" => "y"),
+                            array("from" => "MMCOLLECTION", "from_attr" => "RESERVATIONALLOWED", "to" => "orderAllowed", "bool" => "y"));
+                          $this->move_tags($location, $res_loc, $trans);
+                          $trans = array(
+                            array("from" => "MMCOLLECTION", "to" => "agencyCollectionCode"),
+                            array("from" => "MMCOLLECTION", "from_attr" => "CODE", "to" => "agencyCollectionName"));
+                          $this->move_tags($location, $res_loc->agencyCollectionId->_value, $trans);
+                          $trans = array(
+                            array("from" => "BRANCH", "from_attr" => "CODE", "to" => "agencyBranchCode"),
+                            array("from" => "BRANCH", "to" => "agencyBranchName"));
+                          $this->move_tags($location, $res_loc->agencyBranchId->_value, $trans);
+                          $trans = array(
+                            array("from" => "DEPARTMENT", "to" => "agencyDepartmentCode"),
+                            array("from" => "DEPARTMENT", "from_attr" => "CODE", "to" => "agencyDepartmentName"));
+                          $this->move_tags($location, $res_loc->agencyDepartmentId->_value, $trans);
+                          $trans = array(
+                            array("from" => "PLACEMENT", "to" => "agencyPlacementCode"),
+                            array("from" => "PLACEMENT", "from_attr" => "CODE", "to" => "agencyPlacementName"));
+                          $this->move_tags($location, $res_loc->agencyPlacementId->_value, $trans);
+                          $trans = array(
+                            array("from" => "HOME", "to" => "copiesAvailableCount"),
+                            array("from" => "TOTAL", "to" => "copiesCount"),
+                            array("from" => "DELIVERYDATE", "to" => "itemExpectedDeliveryDate", "date" => "swap"));
+                          $this->move_tags($location, $res_loc, $trans);
+                          unset($res_loc);
+                        }
                         $res_hold->_value->itemHoldings[] = $res_item;
-                        unset($res_loc);
                         unset($res_item);
                       }
                     }
