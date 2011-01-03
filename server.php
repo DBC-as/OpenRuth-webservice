@@ -223,16 +223,16 @@ class openRuth extends webServiceServer {
                             array("from" => "MMCOLLECTION", "from_attr" => "RESERVATIONALLOWED", "to" => "orderAllowed", "bool" => "y"));
                           $this->move_tags($location, $res_loc, $trans);
                           $trans = array(
-                            array("from" => "MMCOLLECTION", "to" => "agencyCollectionCode"),
-                            array("from" => "MMCOLLECTION", "from_attr" => "CODE", "to" => "agencyCollectionName"));
+                            array("from" => "MMCOLLECTION", "from_attr" => "CODE", "to" => "agencyCollectionCode"),
+                            array("from" => "MMCOLLECTION", "to" => "agencyCollectionName"));
                           $this->move_tags($location, $res_loc->agencyCollectionId->_value, $trans);
                           $trans = array(
                             array("from" => "BRANCH", "from_attr" => "CODE", "to" => "agencyBranchCode"),
                             array("from" => "BRANCH", "to" => "agencyBranchName"));
                           $this->move_tags($location, $res_loc->agencyBranchId->_value, $trans);
                           $trans = array(
-                            array("from" => "DEPARTMENT", "to" => "agencyDepartmentCode"),
-                            array("from" => "DEPARTMENT", "from_attr" => "CODE", "to" => "agencyDepartmentName"));
+                            array("from" => "DEPARTMENT", "from_attr" => "CODE", "to" => "agencyDepartmentCode"),
+                            array("from" => "DEPARTMENT", "to" => "agencyDepartmentName"));
                           $this->move_tags($location, $res_loc->agencyDepartmentId->_value, $trans);
                           $trans = array(
                             array("from" => "PLACEMENT", "to" => "agencyPlacementCode"),
