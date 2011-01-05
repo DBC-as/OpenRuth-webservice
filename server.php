@@ -235,8 +235,8 @@ class openRuth extends webServiceServer {
                             array("from" => "DEPARTMENT", "to" => "agencyDepartmentName"));
                           $this->move_tags($location, $res_loc->agencyDepartmentId->_value, $trans);
                           $trans = array(
-                            array("from" => "PLACEMENT", "to" => "agencyPlacementCode"),
-                            array("from" => "PLACEMENT", "from_attr" => "CODE", "to" => "agencyPlacementName"));
+                            array("from" => "PLACEMENT", "from_attr" => "CODE", "to" => "agencyPlacementCode"),
+                            array("from" => "PLACEMENT", "to" => "agencyPlacementName"));
                           $this->move_tags($location, $res_loc->agencyPlacementId->_value, $trans);
                           $trans = array(
                             array("from" => "HOME", "to" => "copiesAvailableCount"),
@@ -1224,6 +1224,7 @@ class openRuth extends webServiceServer {
               array("from" => "NCIP-Title", "to" => "itemTitle"),
               array("from" => "NCIP-PublicationDate", "to" => "itemPublicationYear"),
               array("from" => "NCIP-UnstructuredHoldingsData", "to" => "itemSerialPartTitle"),
+              array("from" => "ServiceCounter", "to" => "agencyCounter"),
               array("from" => "LoanLendingLibrary", "to" => "illProviderAgencyId"),
               array("from" => "ILLStatus", "to" => "illStatus", 
                       "enum" => array("Ny" => "new", 
