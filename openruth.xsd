@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- edited with XMLSpy v2010 rel. 3 (http://www.altova.com) by Dansk Bibliotekscenter A/S (Dansk Bibliotekscenter A/S) -->
+<!-- edited with XMLSpy v2011 (http://www.altova.com) by Dansk Bibliotekscenter A/S (Dansk Bibliotekscenter A/S) -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:or="http://oss.dbc.dk/ns/openruth" targetNamespace="http://oss.dbc.dk/ns/openruth" elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<xs:element name="agencyCountersRequest">
 		<xs:annotation>
@@ -740,6 +740,7 @@
 				<xs:element ref="or:itemTitle" minOccurs="0"/>
 				<xs:element ref="or:itemPublicationYear" minOccurs="0"/>
 				<xs:element ref="or:itemSerialPartTitle" minOccurs="0"/>
+				<xs:element ref="or:agencyCounter"/>
 				<xs:element ref="or:illProviderAgencyId" minOccurs="0"/>
 				<xs:element ref="or:illStatus"/>
 				<xs:element ref="or:illOrderDate"/>
