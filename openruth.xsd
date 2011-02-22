@@ -501,6 +501,7 @@
 			<xs:sequence>
 				<xs:element ref="or:bookingId"/>
 				<xs:element ref="or:itemDisplayTitle"/>
+				<xs:element ref="or:itemId" minOccurs="0"/>
 				<xs:element ref="or:bookingTotalCount"/>
 				<xs:element ref="or:bookingFetchedCount"/>
 				<xs:element ref="or:bookingLoanedCount"/>
@@ -740,6 +741,7 @@
 				<xs:element ref="or:itemTitle" minOccurs="0"/>
 				<xs:element ref="or:itemPublicationYear" minOccurs="0"/>
 				<xs:element ref="or:itemSerialPartTitle" minOccurs="0"/>
+				<xs:element ref="or:itemId" minOccurs="0"/>
 				<xs:element ref="or:agencyCounter"/>
 				<xs:element ref="or:illProviderAgencyId" minOccurs="0"/>
 				<xs:element ref="or:illStatus"/>
@@ -897,6 +899,7 @@
 				<xs:element ref="or:itemAuthor" minOccurs="0"/>
 				<xs:element ref="or:itemTitle" minOccurs="0"/>
 				<xs:element ref="or:itemPublicationYear" minOccurs="0"/>
+				<xs:element ref="or:itemId" minOccurs="0"/>
 				<xs:element ref="or:copyId"/>
 				<xs:element ref="or:loanDate"/>
 				<xs:element ref="or:loanReturnDate"/>
@@ -1084,6 +1087,7 @@
 				<xs:element ref="or:itemTitle" minOccurs="0"/>
 				<xs:element ref="or:itemPublicationYear" minOccurs="0"/>
 				<xs:element ref="or:itemSerialPartTitle" minOccurs="0"/>
+				<xs:element ref="or:itemId" minOccurs="0"/>
 				<xs:element ref="or:agencyCounter"/>
 				<xs:element ref="or:orderId"/>
 				<xs:element ref="or:orderDate"/>
@@ -1137,6 +1141,7 @@
 				<xs:element ref="or:itemTitle" minOccurs="0"/>
 				<xs:element ref="or:itemPublicationYear" minOccurs="0"/>
 				<xs:element ref="or:itemSerialPartTitle" minOccurs="0"/>
+				<xs:element ref="or:itemId" minOccurs="0"/>
 				<xs:element ref="or:agencyCounter"/>
 				<xs:element ref="or:orderPickUpDate" minOccurs="0"/>
 				<xs:element ref="or:orderFetchedDate"/>
