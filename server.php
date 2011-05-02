@@ -298,7 +298,7 @@ class openRuth extends webServiceServer {
         $z->set_authentication($tgt['authentication']);
         $z->set_syntax('xml');
         $z->set_element('default');
-        $rpn = '@attrset 1.2.840.10003.3.1000.105.3 @and @attr 1=1 $agencyId ';
+        $rpn = '@attrset 1.2.840.10003.3.1000.105.3 @and @attr 1=1 ' . $agencyId . ' ';
         if ($param->bookingId->_value)
           $rpn .= '@attr 1=7 \'' . $param->bookingId->_value . '\'';
         elseif ($param->serialPartId->_value)
