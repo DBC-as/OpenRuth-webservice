@@ -5,7 +5,7 @@
       <open:userPaymentRequest>
          <open:agencyId>?</open:agencyId>
          <open:userId>?</open:userId>
-         <open:fineAmountPaid>?</open:fineAmountPaid>
+         <open:feeAmountPaid>?</open:feeAmountPaid>
          <!--Optional:-->
          <open:userPaymentTransactionId>?</open:userPaymentTransactionId>
          <!--Optional:-->

@@ -970,7 +970,7 @@ class openRuth extends webServiceServer {
 
   /** \brief 
    *
-   * @param $param - agencyId, userId, fineAmountPaid, userPaymentTransactionId
+   * @param $param - agencyId, userId, feeAmountPaid, userPaymentTransactionId
    * @return 
    *
    */
@@ -984,7 +984,7 @@ class openRuth extends webServiceServer {
         $pay = &$payment->BorrowerPay->_value;
         $pay->LibraryNo->_value = $agencyId;
         $pay->BorrowerTicketNo->_value = $param->userId->_value;
-        $pay->Amount->_value = $param->fineAmountPaid->_value;
+        $pay->Amount->_value = $param->feeAmountPaid->_value;
         $pay->TransactionID->_value = $param->userPaymentTransactionId->_value;
         $xml = '<?xml version="1.0" encoding="ISO-8859-1" ?'.'>' . utf8_decode($this->objconvert->obj2xml($payment));
         $z = new z3950();

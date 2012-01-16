@@ -7,7 +7,7 @@
 ;service_http_error = HTTP/1.1 410 Gone
 ;service_http_error = HTTP/1.0 503 Service Unavailable
 
-version = 0.7
+version = 0.8
 
 ; wsdl for service
 wsdl = openruth.wsdl
@@ -220,7 +220,7 @@ action[userCheck][] = outputType
 
 action[userPayment][] = agencyId
 action[userPayment][] = userId
-action[userPayment][] = fineAmountPaid
+action[userPayment][] = feeAmountPaid
 action[userPayment][] = callback
 action[userPayment][] = outputType
 
