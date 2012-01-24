@@ -255,6 +255,8 @@
 				<xs:element ref="or:userOrderReadyNotificationPreference" minOccurs="0"/>
 				<xs:element ref="or:userFirstName" minOccurs="0"/>
 				<xs:element ref="or:userLastName" minOccurs="0"/>
+				<xs:element ref="or:userAbsenceStartDate" minOccurs="0"/>
+				<xs:element ref="or:userAbsenceEndDate" minOccurs="0"/>
 				<xs:element ref="or:agencyCounter" minOccurs="0"/>
 				<xs:element ref="or:callback" minOccurs="0"/>
 				<xs:element ref="or:outputType" minOccurs="0"/>
@@ -1220,6 +1222,16 @@
 	<xs:element name="updateUserInfoOk">
 		<xs:annotation>
 			<xs:documentation xml:lang="en">Indicator that updateUserInfoRequest is accepted</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="userAbsenceEndDate">
+			<xs:annotation>
+				<xs:documentation xml:lang="en">End date for a period in which user's orders will be on standby. </xs:documentation>
+			</xs:annotation>	
+	</xs:element>
+	<xs:element name="userAbsenceStartDate">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">Start date for a period in which user's orders will be on standby. If empty existing absence period is removed</xs:documentation>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="userAddress" type="xs:string">
