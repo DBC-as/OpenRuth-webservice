@@ -1375,6 +1375,8 @@
 				<xs:element ref="or:userNote" minOccurs="0" maxOccurs="unbounded"/>
 				<xs:element ref="or:userRecallNotificationPreference" minOccurs="0"/>
 				<xs:element ref="or:userOrderReadyNotificationPreference" minOccurs="0"/>
+				<xs:element ref="or:userAbsenceStartDate" minOccurs="0"/>
+				<xs:element ref="or:userAbsenceEndDate" minOccurs="0"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
