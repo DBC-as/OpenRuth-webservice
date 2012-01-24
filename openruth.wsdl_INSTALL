@@ -293,16 +293,16 @@
 	</wsdl:binding>
 	<wsdl:service name="openRuthService">
 		<wsdl:port name="agencyPortType" binding="orw:agencySoapBinding">
-			<soap:address location="http://openruth.addi.dk/1.8/"/>
+			<soap:address location="http://openruth.addi.dk/0.9/"/>
 		</wsdl:port>
 		<wsdl:port name="bookingPortType" binding="orw:bookingSoapBinding">
-			<soap:address location="http://openruth.addi.dk/1.8/"/>
+			<soap:address location="http://openruth.addi.dk/0.9/"/>
 		</wsdl:port>
 		<wsdl:port name="orderPortType" binding="orw:orderSoapBinding">
-			<soap:address location="http://openruth.addi.dk/1.8/"/>
+			<soap:address location="http://openruth.addi.dk/0.9/"/>
 		</wsdl:port>
 		<wsdl:port name="userPortType" binding="orw:userSoapBinding">
-			<soap:address location="http://openruth.addi.dk/1.8/"/>
+			<soap:address location="http://openruth.addi.dk/0.9/"/>
 		</wsdl:port>
 	</wsdl:service>
 </wsdl:definitions>
