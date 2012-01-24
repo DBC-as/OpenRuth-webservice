@@ -1224,12 +1224,12 @@
 			<xs:documentation xml:lang="en">Indicator that updateUserInfoRequest is accepted</xs:documentation>
 		</xs:annotation>
 	</xs:element>
-	<xs:element name="userAbsenceEndDate">
-			<xs:annotation>
-				<xs:documentation xml:lang="en">End date for a period in which user's orders will be on standby. </xs:documentation>
-			</xs:annotation>	
+	<xs:element name="userAbsenceEndDate" type="xs:date">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">End date for a period in which user's orders will be on standby. </xs:documentation>
+		</xs:annotation>
 	</xs:element>
-	<xs:element name="userAbsenceStartDate">
+	<xs:element name="userAbsenceStartDate" type="xs:date">
 		<xs:annotation>
 			<xs:documentation xml:lang="en">Start date for a period in which user's orders will be on standby. If empty existing absence period is removed</xs:documentation>
 		</xs:annotation>
