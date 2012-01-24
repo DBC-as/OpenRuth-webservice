@@ -19,6 +19,10 @@
          <!--Optional:-->
          <open:userLastName>?</open:userLastName>
          <!--Optional:-->
+         <open:userAbsenceStartDate>?</open:userAbsenceStartDate>
+         <!--Optional:-->
+         <open:userAbsenceEndDate>?</open:userAbsenceEndDate>
+         <!--Optional:-->
          <open:agencyCounter>?</open:agencyCounter>
          <!--Optional:-->
          <open:callback>?</open:callback>
