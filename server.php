@@ -846,8 +846,8 @@ class openRuth extends webServiceServer {
         $bor->BorrowerTicketNo->_value = $param->userId->_value;
         $bor->OldPinCode->_value = $param->userPinCode->_value;
         if ($param->userPinCodeNew->_value) $bor->NewPinCode->_value = $param->userPinCodeNew->_value;
-        if ($param->userEmail) $bor->Email->_value = $param->userEmail->_value;
-        if ($param->userMobilePhone) $bor->MobilePhone->_value = $param->userMobilePhone->_value;
+        if ($param->userEmail->_value) $bor->Email->_value = $param->userEmail->_value;
+        if ($param->userMobilePhone->_value) $bor->MobilePhone->_value = $param->userMobilePhone->_value;
         $notifications = array('sms' => 's', 'email' => 'e', 'both' => 'b');
         if ($param->userRecallNotificationPreference->_value)
           if (!($bor->UsePreReturnMsg->_value = $notifications[$param->userRecallNotificationPreference->_value]))
@@ -858,7 +858,7 @@ class openRuth extends webServiceServer {
         if ($param->userFirstName->_value) $bor->FirstName->_value = $param->userFirstName->_value;
         if ($param->userLastName->_value) $bor->FamilyName->_value = $param->userLastName->_value;
         if ($param->userAbsenceStartDate->_value) $bor->AbsenceStart->_value = $this->to_zruth_date($param->userAbsenceStartDate->_value);
-        if ($param->userAbsenceEndDate->_value) $bor->AbsenceEnd->_value = $this->to_zruth_date($param->userAbsenceEndDate->_value);
+        if ($param->userAbsenceEndDate->_value) $bor->AbsenceStop->_value = $this->to_zruth_date($param->userAbsenceEndDate->_value);
         if ($param->agencyCounter->_value) $bor->StandardCounter->_value = $param->agencyCounter->_value;
         $xml = '<?xml version="1.0" encoding="ISO-8859-1" ?'.'>' . utf8_decode($this->objconvert->obj2xml($borrower));
         $z = new z3950();
@@ -1094,7 +1094,9 @@ class openRuth extends webServiceServer {
           // ... and the rest ...
             $trans = array(
               array('from' => 'UsePreReturnMsg', 'to' => 'userRecallNotificationPreference', 'enum' => array('e' => 'email', 's' => 'sms', 'b' => 'both')),
-              array('from' => 'UseCopyRetainedMsg', 'to' => 'userOrderReadyNotificationPreference', 'enum' => array('e' => 'email', 's' => 'sms', 'b' => 'both')));
+              array('from' => 'UseCopyRetainedMsg', 'to' => 'userOrderReadyNotificationPreference', 'enum' => array('e' => 'email', 's' => 'sms', 'b' => 'both')),
+              array('from' => 'AbsenceStart', 'to' => 'userAbsenceStartDate', 'date' => 'swap'),
+              array('from' => 'AbsenceStop', 'to' => 'userAbsenceEndDate', 'date' => 'swap'));
             $this->move_tags($loaner, $ui, $trans);
 
         // fines
