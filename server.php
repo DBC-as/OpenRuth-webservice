@@ -857,8 +857,8 @@ class openRuth extends webServiceServer {
             $bor->UseCopyRetainedMsg->_value = 'other';
         if ($param->userFirstName->_value) $bor->FirstName->_value = $param->userFirstName->_value;
         if ($param->userLastName->_value) $bor->FamilyName->_value = $param->userLastName->_value;
-        if ($param->userAbsenceStartDate->_value) $bor->AbsenceStart->_value = $this->to_zruth_date($param->userAbsenceStartDate->_value);
-        if ($param->userAbsenceEndDate->_value) $bor->AbsenceStop->_value = $this->to_zruth_date($param->userAbsenceEndDate->_value);
+        if (isset($param->userAbsenceStartDate->_value)) $bor->AbsenceStart->_value = $this->to_zruth_date($param->userAbsenceStartDate->_value);
+        if (isset($param->userAbsenceEndDate->_value)) $bor->AbsenceStop->_value = $this->to_zruth_date($param->userAbsenceEndDate->_value);
         if ($param->agencyCounter->_value) $bor->StandardCounter->_value = $param->agencyCounter->_value;
         $xml = '<?xml version="1.0" encoding="ISO-8859-1" ?'.'>' . utf8_decode($this->objconvert->obj2xml($borrower));
         $z = new z3950();
