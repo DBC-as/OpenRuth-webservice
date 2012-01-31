@@ -1358,7 +1358,7 @@ class openRuth extends webServiceServer {
   }
 
  /** \brief
-  *  return converts from YYYY-MM-DD to DD-MM-YYYY
+  *  return converts from YYYY-MM-DDZ or YYYY-MM-DD+NN:NN to DD-MM-YYYY
   */
   private function to_zruth_date($date) {
     if (strlen($date) >= 10 && substr($date, 4, 1) == '-' && substr($date, 7, 1) == '-')
