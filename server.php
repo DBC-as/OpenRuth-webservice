@@ -1361,8 +1361,8 @@ class openRuth extends webServiceServer {
   *  return converts from YYYY-MM-DD to DD-MM-YYYY
   */
   private function to_zruth_date($date) {
-    if (strlen($date) == 10 && substr($date, 4, 1) == '-' && substr($date, 7, 1) == '-')
-      return substr($date, 8) . '-' .  substr($date, 5, 2) . '-' .  substr($date, 0, 4);
+    if (strlen($date) >= 10 && substr($date, 4, 1) == '-' && substr($date, 7, 1) == '-')
+      return substr($date, 8, 2) . '-' .  substr($date, 5, 2) . '-' .  substr($date, 0, 4);
     else
       return $date;
   }
@@ -1372,7 +1372,7 @@ class openRuth extends webServiceServer {
   */
   private function from_zruth_date($date) {
     if (strlen($date) == 10 && substr($date, 2, 1) == '-' && substr($date, 5, 1) == '-')
-      return substr($date, 6) . '-' .  substr($date, 3, 2) . '-' .  substr($date, 0, 2);
+      return substr($date, 6, 4) . '-' .  substr($date, 3, 2) . '-' .  substr($date, 0, 2);
     else
       return $date;
   }
