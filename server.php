@@ -846,8 +846,8 @@ class openRuth extends webServiceServer {
         $bor->BorrowerTicketNo->_value = $param->userId->_value;
         $bor->OldPinCode->_value = $param->userPinCode->_value;
         if ($param->userPinCodeNew->_value) $bor->NewPinCode->_value = $param->userPinCodeNew->_value;
-        if ($param->userEmail->_value) $bor->Email->_value = $param->userEmail->_value;
-        if ($param->userMobilePhone->_value) $bor->MobilePhone->_value = $param->userMobilePhone->_value;
+        if (isset($param->userEmail->_value)) $bor->Email->_value = $param->userEmail->_value;
+        if (isset($param->userMobilePhone->_value)) $bor->MobilePhone->_value = $param->userMobilePhone->_value;
         $notifications = array('sms' => 's', 'email' => 'e', 'both' => 'b');
         if ($param->userRecallNotificationPreference->_value)
           if (!($bor->UsePreReturnMsg->_value = $notifications[$param->userRecallNotificationPreference->_value]))
