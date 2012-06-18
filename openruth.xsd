@@ -99,7 +99,7 @@
 	</xs:element>
 	<xs:element name="cancelOrderRequest">
 		<xs:annotation>
-			<xs:documentation xml:lang="en">The service request for deleting a reservation</xs:documentation>
+			<xs:documentation xml:lang="en">The service request for deleting an order (local reservation or ill)</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:sequence>
@@ -722,6 +722,13 @@
 			<xs:sequence>
 				<xs:element ref="or:itemId"/>
 				<xs:element ref="or:holdingNote" minOccurs="0"/>
+				<xs:element ref="or:holdingAgency" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="holdingAgency">
+		<xs:complexType>
+			<xs:sequence>
 				<xs:element ref="or:agencyHoldings"/>
 				<xs:element ref="or:itemHoldings" maxOccurs="unbounded"/>
 			</xs:sequence>
