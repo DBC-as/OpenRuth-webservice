@@ -7,7 +7,7 @@
 ;service_http_error = HTTP/1.1 410 Gone
 ;service_http_error = HTTP/1.0 503 Service Unavailable
 
-version = 1.0
+version = 1.1
 
 ; wsdl for service
 wsdl = openruth.wsdl
@@ -73,10 +73,16 @@ dump_timer = openruth(%s)
 [ztargets]
 ; Ruth target_info
 ; set AGENCYID, DB and PASSWD for each AGENCYID
+; host: the z3950 target
+; authentication: The login tripple
+; timeout: in seconds
+; database: databasename
+; agency_holding: include holdings from these agencies. Defaults to the active agency if not specified
 ruth[AGENCYID][host] = z3950.DB.integrabib.dk
 ruth[AGENCYID][authentication] = ophelia/DB/PASSWD
 ruth[AGENCYID][timeout] = 30
 ruth[AGENCYID][database] = DB
+ruth[AGENCYID][agency holding] = agency1,agency2,agency3
 
 [aaa]
 ; aaa Authentication, Access control and Accounting
