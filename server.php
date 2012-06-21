@@ -167,6 +167,8 @@ class openRuth extends webServiceServer {
           foreach ($param->itemId as $pid) $pids[] = $pid->_value;
         else
           $pids[] =$param->itemId->_value;
+        if (empty($tgt['agency_holding'])) 
+          $tgt['agency_holding'] = $agencyId;
         foreach ($pids as $pid) {
           $z->set_rpn(sprintf($rpn, $pid, $agencyId));
           $this->watch->start('zsearch');
@@ -192,9 +194,11 @@ class openRuth extends webServiceServer {
                 $trans = array(
                   array('from' => 'IDNR', 'to' => 'itemId'),
                   array('from' => 'PIFNOTE', 'to' => 'holdingNote'));
-                $this->move_tags($hold, $res_hold->_value, $trans);
+                $this->move_tags($hold, $res_agency->_value, $trans);
                 foreach ($hold->getElementsByTagName('LIBRARY') as $lib) {
-                  if ($lib->getElementsByTagName('LIBRARYNO')->item(0)->nodeValue == $agencyId) {
+                  $this_agency = $lib->getElementsByTagName('LIBRARYNO')->item(0)->nodeValue;
+//                  if (TRUE || strpos($tgt['agency_holding'], $this_agency) !== FALSE) {
+                  if (strpos($tgt['agency_holding'], $this_agency) !== FALSE) {
                     $trans = array(
                       array('from' => 'LIBRARYNO', 'to' => 'agencyId'),
                       array('from' => 'LIBRARYNAME', 'to' => 'agencyName'),
@@ -231,8 +235,8 @@ class openRuth extends webServiceServer {
                             array('from' => 'BRANCH', 'to' => 'agencyBranchName'));
                           $this->move_tags($location, $res_loc->agencyBranchId->_value, $trans);
                           $trans = array(
-                            array('from' => 'DEPARTMENT', 'from_attr' => 'CODE', 'to' => 'agencyDepartmentCode'),
-                            array('from' => 'DEPARTMENT', 'to' => 'agencyDepartmentName'));
+                            array('from' => 'DEPARTMENT', 'from_attr' => 'CODE', 'to' => 'agencyDepartmentCode', 'non_empty' => TRUE),
+                            array('from' => 'DEPARTMENT', 'to' => 'agencyDepartmentName', 'non_empty' => TRUE));
                           $this->move_tags($location, $res_loc->agencyDepartmentId->_value, $trans);
                           $trans = array(
                             array('from' => 'PLACEMENT', 'from_attr' => 'CODE', 'to' => 'agencyPlacementCode'),
@@ -250,10 +254,13 @@ class openRuth extends webServiceServer {
                       }
                     }
                   }
+                  $res_agency->_value->holdingAgency[] = $res_hold;
+                  unset($res_hold);
+
                 }
-                $res->holding[] = $res_hold;
+                $res->holding[] = $res_agency;
 //print_r($res_hold);
-                unset($res_hold);
+                unset($res_agency);
               }
             } else
               $res->agencyError->_value = 'cannot decode answer';
@@ -1338,7 +1345,7 @@ class openRuth extends webServiceServer {
             $to->{$tag['to']}[]->_value = $this->from_zruth_date($node_val);
           elseif ($tag['decimal'])
             $to->{$tag['to']}[]->_value = $this->from_zruth_decimal($node_val);
-          else
+          elseif (empty($tag['non_empty']))
             $to->{$tag['to']}[]->_value = $node_val;
       }
   }
