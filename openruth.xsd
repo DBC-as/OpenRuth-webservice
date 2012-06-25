@@ -1,26 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- edited with XMLSpy v2012 (http://www.altova.com) by DBC A/S (DBC A/S) -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:or="http://oss.dbc.dk/ns/openruth" targetNamespace="http://oss.dbc.dk/ns/openruth" elementFormDefault="qualified" attributeFormDefault="unqualified">
-	<xs:element name="agencyListRequest">
-		<xs:annotation>
-			<xs:documentation xml:lang="en">The service request for looking up agencies that are part of the same institution as the given agency</xs:documentation>
-		</xs:annotation>
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element ref="or:agencyId"/>
-				<xs:element ref="or:callback" minOccurs="0"/>
-				<xs:element ref="or:outputType" minOccurs="0"/>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="agencyListResponse">
-		<xs:complexType>
-			<xs:choice>
-				<xs:element ref="or:agencyError"/>
-				<xs:element ref="or:agency" maxOccurs="unbounded"/>
-			</xs:choice>
-		</xs:complexType>
-	</xs:element>
 	<xs:element name="agencyCountersRequest">
 		<xs:annotation>
 			<xs:documentation xml:lang="en">The service request for information about an agency's counters</xs:documentation>
@@ -38,6 +18,26 @@
 			<xs:choice>
 				<xs:element ref="or:agencyError"/>
 				<xs:element ref="or:agencyCounters"/>
+			</xs:choice>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="agencyListRequest">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">The service request for looking up agencies that are part of the same institution as the given agency</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="or:agencyId"/>
+				<xs:element ref="or:callback" minOccurs="0"/>
+				<xs:element ref="or:outputType" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="agencyListResponse">
+		<xs:complexType>
+			<xs:choice>
+				<xs:element ref="or:agencyError"/>
+				<xs:element ref="or:agency" maxOccurs="unbounded"/>
 			</xs:choice>
 		</xs:complexType>
 	</xs:element>
