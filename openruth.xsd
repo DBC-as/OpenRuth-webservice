@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- edited with XMLSpy v2012 (http://www.altova.com) by DBC A/S (DBC A/S) -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:or="http://oss.dbc.dk/ns/openruth" targetNamespace="http://oss.dbc.dk/ns/openruth" elementFormDefault="qualified" attributeFormDefault="unqualified">
-	<xs:element name="agencyRequest">
+	<xs:element name="agencyListRequest">
 		<xs:annotation>
 			<xs:documentation xml:lang="en">The service request for looking up agencies that are part of the same institution as the given agency</xs:documentation>
 		</xs:annotation>
@@ -13,7 +13,7 @@
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
-	<xs:element name="agencyResponse">
+	<xs:element name="agencyListResponse">
 		<xs:complexType>
 			<xs:choice>
 				<xs:element ref="or:agencyError"/>
