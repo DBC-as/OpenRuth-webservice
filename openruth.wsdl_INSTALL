@@ -5,17 +5,17 @@
 			<xs:import schemaLocation="openruth.xsd" namespace="http://oss.dbc.dk/ns/openruth"/>
       </xs:schema>
    </wsdl:types>
-   <wsdl:message name="agencyRequest">
-	   <wsdl:part name="body" element="or:agencyRequest"/>
-   </wsdl:message>
-   <wsdl:message name="agencyResponse">
-	   <wsdl:part name="body" element="or:agencyResponse"/>
-   </wsdl:message>
    <wsdl:message name="agencyCountersRequest">
 	   <wsdl:part name="body" element="or:agencyCountersRequest"/>
    </wsdl:message>
    <wsdl:message name="agencyCountersResponse">
 	   <wsdl:part name="body" element="or:agencyCountersResponse"/>
+   </wsdl:message>
+   <wsdl:message name="agencyListRequest">
+	   <wsdl:part name="body" element="or:agencyListRequest"/>
+   </wsdl:message>
+   <wsdl:message name="agencyListResponse">
+	   <wsdl:part name="body" element="or:agencyListResponse"/>
    </wsdl:message>
    <wsdl:message name="bookItemRequest">
 	   <wsdl:part name="body" element="or:bookItemRequest"/>
@@ -96,13 +96,13 @@
 	   <wsdl:part name="body" element="or:userStatusResponse"/>
    </wsdl:message>
    <wsdl:portType name="agencyPortType">
-	   <wsdl:operation name="agency">
-		   <wsdl:input message="orw:agencyRequest"/>
-		   <wsdl:output message="orw:agencyResponse"/>
-	   </wsdl:operation>
 	   <wsdl:operation name="agencyCounters">
 		   <wsdl:input message="orw:agencyCountersRequest"/>
 		   <wsdl:output message="orw:agencyCountersResponse"/>
+	   </wsdl:operation>
+	   <wsdl:operation name="agencyList">
+		   <wsdl:input message="orw:agencyListRequest"/>
+		   <wsdl:output message="orw:agencyListResponse"/>
 	   </wsdl:operation>
    	   <wsdl:operation name="holdings">
 		   <wsdl:input message="orw:holdingsRequest"/>
@@ -174,12 +174,12 @@
 				<soap:body use="literal"/>			
 			</wsdl:output>
 		</wsdl:operation>
-		<wsdl:operation name="agency">
-			<soap:operation soapAction="agency"/>
-			<wsdl:input name="agencyRequest">
+		<wsdl:operation name="agencyList">
+			<soap:operation soapAction="agencyList"/>
+			<wsdl:input name="agencyListRequest">
 				<soap:body use="literal"/>
 			</wsdl:input>
-			<wsdl:output name="agencyResponse">
+			<wsdl:output name="agencyListResponse">
 				<soap:body use="literal"/>			
 			</wsdl:output>
 		</wsdl:operation>
