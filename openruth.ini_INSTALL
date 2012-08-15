@@ -133,6 +133,10 @@ action[agencyCounters][] = agencyId
 action[agencyCounters][] = callback
 action[agencyCounters][] = outputType
 
+action[agencyList][] = agencyId
+action[agencyList][] = callback
+action[agencyList][] = outputType
+
 action[holdings][] = agencyId
 action[holdings][] = itemId
 action[holdings][] = callback
@@ -238,11 +242,6 @@ action[userStatus][] = userId
 action[userStatus][] = userPinCode
 action[userStatus][] = callback
 action[userStatus][] = outputType
-
-action[agencyList][] = agencyId
-action[userStatus][] = callback
-action[userStatus][] = outputType
-
 
 [howru]
 ;test[] = search&query=danmark&stepValue=1
