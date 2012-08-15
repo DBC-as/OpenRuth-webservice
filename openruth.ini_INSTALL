@@ -26,6 +26,7 @@ wsdl = openruth.wsdl
 ; soapActions and their corresponding request structure
 ; Can be found in the wsdl but is stated here for convenience
 soapAction[agencyCounters] = agencyCountersRequest
+soapAction[agencyList] = agencyListRequest
 soapAction[holdings] = holdingsRequest
 soapAction[bookingInfo] = bookingInfoRequest
 soapAction[bookItem] = bookItemRequest
@@ -39,7 +40,6 @@ soapAction[updateUserInfo] = updateUserInfoRequest
 soapAction[userCheck] = userCheckRequest
 soapAction[userPayment] = userPaymentRequest
 soapAction[userStatus] = userStatusRequest
-soapAction[agencyList] = agencyListRequest
 
 
 ; prefixes and namespaces
@@ -240,7 +240,8 @@ action[userStatus][] = callback
 action[userStatus][] = outputType
 
 action[agencyList][] = agencyId
-
+action[userStatus][] = callback
+action[userStatus][] = outputType
 
 
 [howru]
