@@ -39,6 +39,7 @@ soapAction[updateUserInfo] = updateUserInfoRequest
 soapAction[userCheck] = userCheckRequest
 soapAction[userPayment] = userPaymentRequest
 soapAction[userStatus] = userStatusRequest
+soapAction[agencyList] = agencyListRequest
 
 
 ; prefixes and namespaces
@@ -237,6 +238,8 @@ action[userStatus][] = userId
 action[userStatus][] = userPinCode
 action[userStatus][] = callback
 action[userStatus][] = outputType
+
+action[agencyList][] = agencyId
 
 
 

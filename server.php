@@ -189,7 +189,7 @@ class openRuth extends webServiceServer {
 //echo 'holdings: /' . $holdings . "/\n"; die();
             $dom = new DomDocument();
             $dom->preserveWhiteSpace = false;
-            if ($dom->loadXML($holdings)) {
+            if (!empty($holdings) and $dom->loadXML($holdings)) {
               foreach ($dom->getElementsByTagName('HOLDING') as $hold) {
                 $trans = array(
                   array('from' => 'IDNR', 'to' => 'itemId'),
@@ -1280,6 +1280,66 @@ class openRuth extends webServiceServer {
     }
 
     $ret->userStatusResponse->_value = $res;
+    //var_dump($param); print_r($res); die();
+    return $ret;
+  }
+
+
+  /** \brief 
+   *
+   * @param $param 
+   * @return Information about the agency
+   *
+   */
+  function agencyList($param) { 
+    if (!$this->aaa->has_right('openruth', 500)) {
+      $res->agencyError->_value = 'authentication_error';
+    } else {
+      $targets = $this->config->get_value('ruth', 'ztargets');
+      $agencyId = $this->strip_agency($param->agencyId->_value);
+      if ($tgt = $targets[$agencyId]) {
+        $z = new z3950();
+        $z->set_target($tgt['host']);
+        $z->set_database($tgt['database'].'-librarylist');
+        $z->set_authentication($tgt['authentication']);
+        $z->set_syntax('xml');
+        $z->set_element('default');
+        $rpn = '@attrset 1.2.840.10003.3.1000.105.3 @attr 1=1 ' . $agencyId;
+        $z->set_rpn($rpn);
+        $this->watch->start('zsearch');
+        $hits = $z->z3950_search($tgt['timeout']);
+        $this->watch->stop('zsearch');
+        if ($err = $z->get_errno()) {
+          if (!($res->agencyError->_value = $this->errs[$err])) 
+            $res->agencyError->_value = 'cannot reach local system - (' . $err . ')';
+        } elseif (empty($hits)) {
+          $res->agencyError->_value = 'No counters found';
+        } else {
+          $this->watch->start('zrecord');
+          $rec = $z->z3950_record();
+          $this->watch->stop('zrecord');
+          //print_r($rec); die();
+          $dom = new DomDocument();
+          $dom->preserveWhiteSpace = false;
+          if ($dom->loadXML($rec)) {
+            $libraries = &$dom->getElementsByTagName('Library');
+            $i = 0;
+            foreach ($libraries as $library) {
+              $res->agency[$i]->_value->agencyId->_value = $library->getElementsByTagName('LIBRARYNO')->item(0)->nodeValue;
+              $res->agency[$i]->_value->agencyName->_value = $library->getElementsByTagName('LIBRARYNAME')->item(0)->nodeValue;
+              $res->agency[$i]->_value->agencyFullName->_value = $library->getElementsByTagName('LIBRARYLONGNAME')->item(0)->nodeValue;
+              $i++;
+            }
+          } else {
+            $res->agencyError->_value = 'cannot decode answer';
+          }
+        }
+      } else {
+        $res->agencyError->_value = 'unknown agencyId';
+      }
+    }
+
+    $ret->agencyListResponse->_value = $res;
     //var_dump($param); print_r($res); die();
     return $ret;
   }
