@@ -98,6 +98,9 @@ class openRuth extends webServiceServer {
         $z->set_target($tgt['host']);
         $z->set_database($tgt['database'].'-libraryid');
         $z->set_authentication($tgt['authentication']);
+        if ($tgt['proxy']) {
+          $z->set_proxy($tgt['proxy']);
+        }
         $z->set_syntax('xml');
         $z->set_element('default');
         $rpn = '@attrset 1.2.840.10003.3.1000.105.3 @attr 1=1 %s';
