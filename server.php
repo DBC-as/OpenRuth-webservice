@@ -1348,36 +1348,6 @@ class openRuth extends webServiceServer {
   }
 
 
-
-
-
-  /** \brief Echos config-settings
-   *
-   */
-  public function show_info() {
-    echo '<pre>';
-    echo 'version      ' . $this->config->get_value('version', 'setup') . '<br/>';
-    echo 'logfile      ' . $this->config->get_value('logfile', 'setup') . '<br/>';
-    echo 'verbose      ' . $this->config->get_value('verbose', 'setup') . '<br/>';
-    $ruth = $this->config->get_value('ruth', 'ztargets');
-    $tgt_txt = 'targets      ';
-    foreach ($ruth as $agency => $settings) {
-      echo $tgt_txt . $agency . ' ' . $settings['host'] . '<br/>';
-      $tgt_txt = '  -          ';
-    }
-    $val = $this->config->get_value('validate', 'setup');
-    if (empty($val))
-      echo 'validation   None set<br/>';
-    else {
-      echo 'validate     ';
-      foreach ($val as $key => $type) echo $key . ' ';
-      echo '<br />';
-    }
-    echo '</pre>';
-    die();
-  }
-
-
   /** \brief Move nodes and attributes from dom-object to object according to rules in $tags
    *
    * @param $from dom object
