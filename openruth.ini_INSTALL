@@ -245,6 +245,20 @@ action[userStatus][] = userPinCode
 action[userStatus][] = callback
 action[userStatus][] = outputType
 
+[showinfo]
+; section to dump setting online
+; make one or more line to display if ?ShowInfo is part of the url
+; __var__ will be replace by the corresponding ini-file setting - if it exists
+; __var.section__ will be replace by the corresponding ini-file setting from section [section]
+; this will only work if the user from in_house_domain - see above
+;showinfo[] = <pre>
+;showinfo[] = version: __version__
+;showinfo[] = logfile: __logfile__
+;showinfo[] = verbose: __verbose__
+;showinfo[] = ruths: __ruth__
+;showinfo[] = validate: __validate__
+;showinfo[] = </pre>
+
 [howru]
 ;test[] = search&query=danmark&stepValue=1
 ;preg_match[] = hitCount
